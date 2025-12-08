@@ -85,7 +85,7 @@ const People = () => {
       <h1>met add</h1>
       {people.map((p, index) => {
         return (
-          <div key={p.id}>
+          <div key={p.id + index}>
             {p.firstName} {p.lastName}
           </div>
         );
