@@ -1,7 +1,7 @@
 {
   "name": "labo4-shoppinglist",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "dependencies": {
     "@tailwindcss/vite": "^4.1.17",
     "@types/react": "^19.2.7",
