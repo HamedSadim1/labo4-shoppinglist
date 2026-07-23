@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState } from 'react';
 
 let nextId = 3;
 const initialArtists = [
-  { id: 0, name: "Marta Colvin Andrade" },
-  { id: 1, name: "Lamidi Olonade Fakeye" },
-  { id: 2, name: "Louise Nevelson" },
+  { id: 0, name: 'Marta Colvin Andrade' },
+  { id: 1, name: 'Lamidi Olonade Fakeye' },
+  { id: 2, name: 'Louise Nevelson' },
 ];
 
 export default function FriendList() {
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
   const [artists, setArtists] = useState(initialArtists);
 
   function handleClick() {
@@ -22,7 +22,7 @@ export default function FriendList() {
       ...artists.slice(insertAt),
     ];
     setArtists(nextArtists);
-    setName("");
+    setName('');
   }
 
   return (

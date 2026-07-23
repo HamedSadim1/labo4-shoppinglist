@@ -1,15 +1,15 @@
-import { useState } from "react";
-import { generate } from "shortid";
-import { ShoppingItem, categories } from "../types";
+import { useState } from 'react';
+import { generate } from 'shortid';
+import { ShoppingItem, categories } from '../types';
 
 interface AddItemFormProps {
   onAddItem: (item: ShoppingItem) => void;
 }
 
 export default function AddItemForm({ onAddItem }: AddItemFormProps) {
-  const [name, setName] = useState("");
+  const [name, setName] = useState('');
   const [amount, setAmount] = useState(1);
-  const [category, setCategory] = useState("General");
+  const [category, setCategory] = useState('General');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,16 +24,14 @@ export default function AddItemForm({ onAddItem }: AddItemFormProps) {
     };
 
     onAddItem(newItem);
-    setName("");
+    setName('');
     setAmount(1);
-    setCategory("General");
+    setCategory('General');
   };
 
   return (
     <div className="backdrop-blur-md bg-white/20 border border-white/30 rounded-2xl p-6 mb-6 shadow-2xl">
-      <h2 className="text-2xl font-semibold mb-4 text-white drop-shadow-lg">
-        Add New Item
-      </h2>
+      <h2 className="text-2xl font-semibold mb-4 text-white drop-shadow-lg">Add New Item</h2>
       <form onSubmit={handleSubmit}>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <input

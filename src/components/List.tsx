@@ -1,5 +1,5 @@
-import { produce } from "immer";
-import React, { useState } from "react";
+import { produce } from 'immer';
+import React, { useState } from 'react';
 
 interface ListItem {
   firstName: string;
@@ -7,7 +7,7 @@ interface ListItem {
 }
 
 const List = () => {
-  const [list, setList] = useState<ListItem[]>([{ firstName: "", email: "" }]);
+  const [list, setList] = useState<ListItem[]>([{ firstName: '', email: '' }]);
 
   const addListItem: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -33,7 +33,7 @@ const List = () => {
                   setList((currentPeople) =>
                     produce(currentPeople, (v) => {
                       v[index].firstName = lastName;
-                    })
+                    }),
                   );
                 }}
               />
@@ -48,7 +48,7 @@ const List = () => {
                   setList((currentPeople) =>
                     produce(currentPeople, (v) => {
                       v[index].email = email;
-                    })
+                    }),
                   );
                 }}
               />

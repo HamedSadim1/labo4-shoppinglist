@@ -7,13 +7,13 @@ export interface ShoppingItem {
 }
 
 export const categories = [
-  "General",
-  "Fruits",
-  "Vegetables",
-  "Dairy",
-  "Meat",
-  "Bakery",
-  "Pantry",
+  'General',
+  'Fruits',
+  'Vegetables',
+  'Dairy',
+  'Meat',
+  'Bakery',
+  'Pantry',
 ] as const;
 
 export type Category = (typeof categories)[number];

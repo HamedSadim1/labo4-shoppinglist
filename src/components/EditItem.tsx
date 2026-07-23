@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { ShoppingItem, categories } from "../types";
+import { useState } from 'react';
+import { ShoppingItem, categories } from '../types';
 
 interface EditItemProps {
   item: ShoppingItem;
@@ -19,9 +19,9 @@ export default function EditItem({ item, onSave, onCancel }: EditItemProps) {
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
+    if (e.key === 'Enter') {
       handleSave();
-    } else if (e.key === "Escape") {
+    } else if (e.key === 'Escape') {
       onCancel();
     }
   };

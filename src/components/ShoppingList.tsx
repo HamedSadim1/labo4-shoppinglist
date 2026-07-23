@@ -1,15 +1,15 @@
-import { useState } from "react";
-import { ShoppingItem } from "../types";
-import { useLocalStorage } from "../hooks";
-import AddItemForm from "./AddItemForm";
-import ItemFilters from "./ItemFilters";
-import ItemStats from "./ItemStats";
-import ItemList from "./ItemList";
+import { useState } from 'react';
+import { ShoppingItem } from '../types';
+import { useLocalStorage } from '../hooks';
+import AddItemForm from './AddItemForm';
+import ItemFilters from './ItemFilters';
+import ItemStats from './ItemStats';
+import ItemList from './ItemList';
 
 export default function ShoppingList() {
-  const [items, setItems] = useLocalStorage<ShoppingItem[]>("shoppingList", []);
+  const [items, setItems] = useLocalStorage<ShoppingItem[]>('shoppingList', []);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [filter, setFilter] = useState("all");
+  const [filter, setFilter] = useState('all');
 
   const addItem = (item: ShoppingItem) => {
     setItems([...items, item]);
@@ -17,9 +17,7 @@ export default function ShoppingList() {
 
   const toggleComplete = (id: string) => {
     setItems(
-      items.map((item) =>
-        item.id === id ? { ...item, completed: !item.completed } : item
-      )
+      items.map((item) => (item.id === id ? { ...item, completed: !item.completed } : item)),
     );
   };
 
@@ -31,17 +29,8 @@ export default function ShoppingList() {
     setEditingId(id);
   };
 
-  const saveEdit = (
-    id: string,
-    name: string,
-    amount: number,
-    category: string
-  ) => {
-    setItems(
-      items.map((item) =>
-        item.id === id ? { ...item, name, amount, category } : item
-      )
-    );
+  const saveEdit = (id: string, name: string, amount: number, category: string) => {
+    setItems(items.map((item) => (item.id === id ? { ...item, name, amount, category } : item)));
     setEditingId(null);
   };
 
@@ -54,9 +43,9 @@ export default function ShoppingList() {
   };
 
   const filteredItems = items.filter((item) => {
-    if (filter === "all") return true;
-    if (filter === "completed") return item.completed;
-    if (filter === "pending") return !item.completed;
+    if (filter === 'all') return true;
+    if (filter === 'completed') return item.completed;
+    if (filter === 'pending') return !item.completed;
     return item.category === filter;
   });
 

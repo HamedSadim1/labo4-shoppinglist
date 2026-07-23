@@ -1,4 +1,4 @@
-import { ShoppingItem } from "../types";
+import { ShoppingItem } from '../types';
 
 interface ItemProps {
   item: ShoppingItem;
@@ -7,16 +7,11 @@ interface ItemProps {
   onRemove: (id: string) => void;
 }
 
-export default function Item({
-  item,
-  onToggleComplete,
-  onEdit,
-  onRemove,
-}: ItemProps) {
+export default function Item({ item, onToggleComplete, onEdit, onRemove }: ItemProps) {
   return (
     <div
       className={`backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-4 transition-all duration-200 shadow-xl ${
-        item.completed ? "opacity-75" : ""
+        item.completed ? 'opacity-75' : ''
       }`}
     >
       <div className="flex items-center justify-between">
@@ -27,17 +22,9 @@ export default function Item({
             onChange={() => onToggleComplete(item.id)}
             className="w-5 h-5 text-white bg-white/10 border-white/30 rounded focus:ring-white/50 focus:ring-2"
           />
-          <div
-            className={`flex-1 ${
-              item.completed ? "line-through text-white/60" : ""
-            }`}
-          >
-            <span className="font-medium text-white drop-shadow-sm">
-              {item.name}
-            </span>
-            <span className="ml-2 text-sm text-white/80 drop-shadow-sm">
-              (x{item.amount})
-            </span>
+          <div className={`flex-1 ${item.completed ? 'line-through text-white/60' : ''}`}>
+            <span className="font-medium text-white drop-shadow-sm">{item.name}</span>
+            <span className="ml-2 text-sm text-white/80 drop-shadow-sm">(x{item.amount})</span>
             <span className="ml-2 inline-block px-3 py-1 text-xs rounded-full bg-white/20 border border-white/30 text-white/90 backdrop-blur-sm">
               {item.category}
             </span>
