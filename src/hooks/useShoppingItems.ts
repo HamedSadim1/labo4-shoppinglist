@@ -29,29 +29,37 @@ export function useShoppingItems() {
     return () => clearTimeout(timer);
   }, [lastAddedId]);
 
+  /* eslint-disable react-hooks/exhaustive-deps -- setters from useState/useLocalStorage are React-stable; functional setState means no closure reads of `items` */
   const addItem = useCallback((item: ShoppingItem) => {
     setItems((prev) => [item, ...prev]);
     setLastAddedId(item.id);
   }, []);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
+  /* eslint-disable react-hooks/exhaustive-deps -- setters are React-stable; functional updater means no closure reads of items */
   const toggleComplete = useCallback((id: string) => {
     setItems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, completed: !item.completed } : item)),
     );
   }, []);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
+  /* eslint-disable react-hooks/exhaustive-deps -- setters are React-stable; functional updater means no closure reads of items */
   const removeItem = useCallback((id: string) => {
     setItems((prev) => prev.filter((item) => item.id !== id));
   }, []);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   const startEdit = useCallback((id: string) => setEditingId(id), []);
 
+  /* eslint-disable react-hooks/exhaustive-deps -- setters are React-stable; functional updater means no closure reads of items */
   const saveEdit = useCallback((id: string, name: string, amount: number, category: string) => {
     setItems((prev) =>
       prev.map((item) => (item.id === id ? { ...item, name, amount, category } : item)),
     );
     setEditingId(null);
   }, []);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   const cancelEdit = useCallback(() => setEditingId(null), []);
 
@@ -96,6 +104,7 @@ export function useShoppingItems() {
    * Removes all completed items. Returns the number that were removed so the
    * consumer can drive UI side-effects (toasts) without re-deriving it.
    */
+  /* eslint-disable react-hooks/exhaustive-deps -- count derived inside the updater so deps can stay empty; setters are React-stable */
   const clearCompleted = useCallback(() => {
     // The closure used to read `items` for the count, which forced
     // `[items]` deps and rebuilt the ref on every CRUD mutation.
@@ -111,6 +120,7 @@ export function useShoppingItems() {
     });
     return count;
   }, []);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   return {
     items: filteredItems,
