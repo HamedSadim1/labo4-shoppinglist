@@ -9,17 +9,50 @@ export default function ItemStats({
   completedItems,
   onClearCompleted,
 }: ItemStatsProps) {
+  const progress = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
+
   return (
-    <div className="flex flex-col sm:flex-row justify-between items-center mb-4">
-      <div className="text-white/80 drop-shadow-md mb-2 sm:mb-0">
-        {completedItems} of {totalItems} items completed
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+      <div className="w-full sm:flex-1">
+        {/* Progress bar */}
+        <div className="flex items-center gap-3 mb-1.5">
+          <div className="flex-1 h-2 bg-white/10 rounded-full overflow-hidden backdrop-blur-sm">
+            <div
+              className="h-full bg-gradient-to-r from-green-400/60 to-emerald-300/60 rounded-full transition-all duration-500 ease-out"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+          <span className="text-white/70 text-sm font-medium whitespace-nowrap min-w-[4rem] text-right">
+            {progress}%
+          </span>
+        </div>
+        <p className="text-white/50 text-xs sm:text-sm">
+          <span className="text-white/80 font-medium">{completedItems}</span>
+          <span className="text-white/40"> of </span>
+          <span className="text-white/80 font-medium">{totalItems}</span>
+          <span className="text-white/40"> items completed</span>
+        </p>
       </div>
+
       {completedItems > 0 && (
         <button
           onClick={onClearCompleted}
-          className="bg-red-500/20 hover:bg-red-500/30 border border-red-400/40 text-white font-semibold px-4 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm hover:shadow-lg"
+          className="flex items-center gap-1.5 bg-red-500/15 hover:bg-red-500/25 border border-red-400/25 text-red-300 text-sm font-medium px-4 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm hover:shadow-lg active:scale-[0.97] whitespace-nowrap"
         >
-          Clear Completed
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+          <span>Clear done ({completedItems})</span>
         </button>
       )}
     </div>
