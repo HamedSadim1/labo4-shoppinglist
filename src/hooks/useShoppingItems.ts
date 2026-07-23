@@ -97,10 +97,20 @@ export function useShoppingItems() {
    * consumer can drive UI side-effects (toasts) without re-deriving it.
    */
   const clearCompleted = useCallback(() => {
-    const count = items.filter((item) => item.completed).length;
-    if (count > 0) setItems((prev) => prev.filter((item) => !item.completed));
+    // The closure used to read `items` for the count, which forced
+    // `[items]` deps and rebuilt the ref on every CRUD mutation.
+    // Deriving the count *inside* the functional updater lets us drop the
+    // items dep entirely — the outer `count` settles to the value
+    // corresponding to whatever state React actually commits (StrictMode
+    // runs the updater twice in dev with the same answer; concurrent
+    // rendering uses the latest prev). Returns the count of items cleared.
+    let count = 0;
+    setItems((prev) => {
+      count = prev.filter((item) => item.completed).length;
+      return count > 0 ? prev.filter((item) => !item.completed) : prev;
+    });
     return count;
-  }, [items]);
+  }, []);
 
   return {
     items: filteredItems,
