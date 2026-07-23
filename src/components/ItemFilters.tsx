@@ -1,20 +1,15 @@
 import { categories, ShoppingListFilter } from '../types';
+import { FILTER_OPTIONS } from '../config';
 
 interface ItemFiltersProps {
   filter: ShoppingListFilter | string;
   onFilterChange: (filter: string) => void;
 }
 
-const filterOptions: { id: ShoppingListFilter | string; label: string; icon: string }[] = [
-  { id: 'all', label: 'All', icon: '📋' },
-  { id: 'pending', label: 'Pending', icon: '⏳' },
-  { id: 'completed', label: 'Done', icon: '✅' },
-];
-
 export default function ItemFilters({ filter, onFilterChange }: ItemFiltersProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
-      {filterOptions.map((opt) => (
+      {FILTER_OPTIONS.map((opt) => (
         <button
           key={opt.id}
           onClick={() => onFilterChange(opt.id)}

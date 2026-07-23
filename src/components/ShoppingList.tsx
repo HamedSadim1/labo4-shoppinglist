@@ -1,22 +1,22 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
+import { useClearFlow } from '../hooks/useClearFlow';
 import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
-import { useToast } from '../hooks/useToast';
 import { useShoppingItems } from '../hooks/useShoppingItems';
+import { useToast } from '../hooks/useToast';
 import AddItemForm from './AddItemForm';
 import ClearCompletedDialog from './ClearCompletedDialog';
 import ItemList from './ItemList';
 import ItemsToolbar from './ItemsToolbar';
 
 /**
- * Composition shell. All state lives in `useShoppingItems`; the toolbar
- * (`<ItemsToolbar />`) and confirm modal (`<ClearCompletedDialog />`) are
- * extracted for single-responsibility. The '/'-focus keyboard shortcut and
- * the Escape priority chain (modal → edit → search) live in the global
- * `useKeyboardShortcuts` hook — ShoppingList only feeds it the closures.
+ * Composition shell. Domain state lives in `useShoppingItems`; the
+ * clear-confirm workflow (state + handlers + toast) is owned by
+ * `useClearFlow`; keyboard handlers live in the global
+ * `useKeyboardShortcuts` hook. Each subcomponent receives only the
+ * props it needs.
  */
 export default function ShoppingList() {
   const searchRef = useRef<HTMLInputElement>(null);
-  const [showClearConfirm, setShowClearConfirm] = useState(false);
   const { push } = useToast();
 
   const {
@@ -40,16 +40,10 @@ export default function ShoppingList() {
     setSearchQuery,
   } = useShoppingItems();
 
-  const handleClearCompleted = () => {
-    const count = clearCompleted();
-    setShowClearConfirm(false);
-    if (count > 0) {
-      push(
-        count === 1 ? 'Cleared 1 completed item' : `Cleared ${count} completed items`,
-        'success',
-      );
-    }
-  };
+  const { showClearConfirm, requestClear, cancelClear, confirmClear } = useClearFlow(
+    clearCompleted,
+    push,
+  );
 
   useKeyboardShortcuts({
     searchRef,
@@ -58,7 +52,7 @@ export default function ShoppingList() {
     escapes: [
       () => {
         if (showClearConfirm) {
-          setShowClearConfirm(false);
+          cancelClear();
           return true;
         }
         return false;
@@ -80,7 +74,7 @@ export default function ShoppingList() {
       <ItemsToolbar
         totalItems={totalItems}
         completedItems={completedItems}
-        onClearCompleted={() => setShowClearConfirm(true)}
+        onClearCompleted={requestClear}
         searchRef={searchRef}
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -106,8 +100,8 @@ export default function ShoppingList() {
       <ClearCompletedDialog
         open={showClearConfirm}
         completedCount={completedItems}
-        onConfirm={handleClearCompleted}
-        onCancel={() => setShowClearConfirm(false)}
+        onConfirm={confirmClear}
+        onCancel={cancelClear}
       />
     </div>
   );

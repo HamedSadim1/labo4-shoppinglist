@@ -1,7 +1,8 @@
 import Card from './ui/Card';
+import { DATE } from '../config';
 
 export default function Header() {
-  const today = new Date().toLocaleDateString('nl-NL', {
+  const today = new Date().toLocaleDateString(DATE.LOCALE, {
     weekday: 'long',
     day: 'numeric',
     month: 'long',

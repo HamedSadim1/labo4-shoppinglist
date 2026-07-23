@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { KEYBOARD } from '../config';
 
 /**
  * Single global keydown listener for the shopping list shell.
@@ -37,13 +38,16 @@ export function useKeyboardShortcuts({
       const isEditable =
         target?.isContentEditable || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
 
-      if (event.key === '/' && !isEditable) {
+      if (event.key === KEYBOARD.SEARCH_FOCUS_KEY && !isEditable) {
         event.preventDefault();
         searchRef.current?.focus();
         return;
       }
 
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+      if (
+        (event.metaKey || event.ctrlKey) &&
+        event.key.toLowerCase() === KEYBOARD.SEARCH_FOCUS_MODIFIER_KEY
+      ) {
         event.preventDefault();
         searchRef.current?.focus();
         searchRef.current?.select();

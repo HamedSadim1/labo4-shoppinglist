@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ShoppingItem, ShoppingListFilter, SortOption } from '../types';
 import { useLocalStorage } from '../hooks';
-import { STORAGE_KEYS } from '../config';
+import { ANIMATION, STORAGE_KEYS } from '../config';
 
 /**
  * Single hook owning the shopping list's business state and lifecycle:
@@ -25,33 +25,35 @@ export function useShoppingItems() {
   // timer cleanly via the effect's cleanup return.
   useEffect(() => {
     if (!lastAddedId) return;
-    const timer = setTimeout(() => setLastAddedId(null), 1500);
+    const timer = setTimeout(() => setLastAddedId(null), ANIMATION.HIGHLIGHT_PULSE_MS);
     return () => clearTimeout(timer);
   }, [lastAddedId]);
 
-  const addItem = (item: ShoppingItem) => {
-    setItems([item, ...items]);
+  const addItem = useCallback((item: ShoppingItem) => {
+    setItems((prev) => [item, ...prev]);
     setLastAddedId(item.id);
-  };
+  }, []);
 
-  const toggleComplete = (id: string) => {
-    setItems(
-      items.map((item) => (item.id === id ? { ...item, completed: !item.completed } : item)),
+  const toggleComplete = useCallback((id: string) => {
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, completed: !item.completed } : item)),
     );
-  };
+  }, []);
 
-  const removeItem = (id: string) => {
-    setItems(items.filter((item) => item.id !== id));
-  };
+  const removeItem = useCallback((id: string) => {
+    setItems((prev) => prev.filter((item) => item.id !== id));
+  }, []);
 
-  const startEdit = (id: string) => setEditingId(id);
+  const startEdit = useCallback((id: string) => setEditingId(id), []);
 
-  const saveEdit = (id: string, name: string, amount: number, category: string) => {
-    setItems(items.map((item) => (item.id === id ? { ...item, name, amount, category } : item)));
+  const saveEdit = useCallback((id: string, name: string, amount: number, category: string) => {
+    setItems((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, name, amount, category } : item)),
+    );
     setEditingId(null);
-  };
+  }, []);
 
-  const cancelEdit = () => setEditingId(null);
+  const cancelEdit = useCallback(() => setEditingId(null), []);
 
   const filteredItems = useMemo(() => {
     let result = [...items];
@@ -94,11 +96,11 @@ export function useShoppingItems() {
    * Removes all completed items. Returns the number that were removed so the
    * consumer can drive UI side-effects (toasts) without re-deriving it.
    */
-  const clearCompleted = () => {
+  const clearCompleted = useCallback(() => {
     const count = items.filter((item) => item.completed).length;
-    if (count > 0) setItems(items.filter((item) => !item.completed));
+    if (count > 0) setItems((prev) => prev.filter((item) => !item.completed));
     return count;
-  };
+  }, [items]);
 
   return {
     items: filteredItems,

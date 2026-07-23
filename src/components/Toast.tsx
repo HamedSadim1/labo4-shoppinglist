@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { ToastContext, type Toast, type ToastVariant } from '../hooks/useToast';
 import { AlertTriangleMiniIcon, CheckIcon, InfoIcon, XIcon } from './ui/icons';
-
-// --- Defaults ------------------------------------------------------------
-
-const AUTO_DISMISS_MS = 3200;
-const MAX_TOASTS = 4;
+import { TOAST } from '../config';
 
 // --- Provider -----------------------------------------------------------
 
@@ -38,8 +34,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         const next = [...current, { id, message, variant }];
         // If we exceed the cap, evict the oldest and clear its pending
         // auto-dismiss timer so it doesn't fire on a now-removed toast.
-        if (next.length > MAX_TOASTS) {
-          const evicted = next.slice(0, next.length - MAX_TOASTS);
+        if (next.length > TOAST.MAX_TOASTS) {
+          const evicted = next.slice(0, next.length - TOAST.MAX_TOASTS);
           for (const t of evicted) {
             const timer = timersRef.current.get(t.id);
             if (timer) {
@@ -48,9 +44,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             }
           }
         }
-        return next.slice(-MAX_TOASTS);
+        return next.slice(-TOAST.MAX_TOASTS);
       });
-      const timer = setTimeout(() => dismiss(id), AUTO_DISMISS_MS);
+      const timer = setTimeout(() => dismiss(id), TOAST.AUTO_DISMISS_MS);
       timersRef.current.set(id, timer);
     },
     [dismiss],
