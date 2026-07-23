@@ -1,5 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
-import { ShoppingItem, categories } from '../types';
+import { ShoppingItem } from '../types';
+import AmountInput from './ui/AmountInput';
+import CategorySelect from './ui/CategorySelect';
+import { INPUT } from '../config';
 
 interface EditItemProps {
   item: ShoppingItem;
@@ -34,8 +37,8 @@ export default function EditItem({ item, onSave, onCancel }: EditItemProps) {
   };
 
   return (
-    <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-3 shadow-xl border border-white/20 animate-scale-in">
-      <div className="flex items-center gap-2">
+    <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-3 shadow-xl border border-purple-400/20 animate-scale-in">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         <div className="flex-1">
           <input
             ref={inputRef}
@@ -43,38 +46,20 @@ export default function EditItem({ item, onSave, onCancel }: EditItemProps) {
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={handleKeyDown}
-            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border border-white/25 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-white/50 focus:ring-2 focus:ring-white/15 transition-all duration-200 backdrop-blur-sm"
-            maxLength={100}
+            className="w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/40 focus:outline-none focus:border-purple-400/50 focus:ring-2 focus:ring-purple-400/15 transition-all duration-200 backdrop-blur-sm"
+            maxLength={INPUT.MAX_LENGTH}
             placeholder="Item name"
           />
         </div>
         <div className="flex gap-2">
-          <input
-            type="number"
-            min="1"
-            max="999"
-            value={amount}
-            onChange={(e) => setAmount(Math.min(999, Math.max(1, parseInt(e.target.value) || 1)))}
-            onKeyDown={handleKeyDown}
-            className="w-16 sm:w-20 px-3 py-2.5 sm:py-3 bg-white/10 border border-white/25 rounded-xl text-white text-center focus:outline-none focus:border-white/50 focus:ring-2 focus:ring-white/15 transition-all duration-200 backdrop-blur-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value)}
-            className="px-3 py-2.5 sm:py-3 bg-white/10 border border-white/25 rounded-xl text-white focus:outline-none focus:border-white/50 focus:ring-2 focus:ring-white/15 transition-all duration-200 backdrop-blur-sm cursor-pointer"
-          >
-            {categories.map((cat) => (
-              <option key={cat.id} value={cat.id} className="bg-gray-800 text-white">
-                {cat.emoji} {cat.label}
-              </option>
-            ))}
-          </select>
+          <AmountInput value={amount} onChange={setAmount} onKeyDown={handleKeyDown} />
+          <CategorySelect value={category} onChange={setCategory} onKeyDown={handleKeyDown} />
         </div>
       </div>
       <div className="flex gap-2 justify-end">
         <button
           onClick={handleSave}
-          className="flex items-center gap-1.5 bg-green-500/20 hover:bg-green-500/30 border border-green-400/30 text-green-200 font-semibold px-4 sm:px-5 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm hover:shadow-lg active:scale-[0.97] text-sm"
+          className="flex items-center gap-1.5 bg-gradient-to-r from-purple-500/30 to-pink-500/30 hover:from-purple-500/40 hover:to-pink-500/40 border border-purple-400/30 text-purple-100 font-semibold px-4 sm:px-5 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm hover:shadow-lg hover:shadow-purple-500/20 active:scale-[0.97] text-sm"
         >
           <svg
             className="w-4 h-4"
@@ -89,7 +74,7 @@ export default function EditItem({ item, onSave, onCancel }: EditItemProps) {
         </button>
         <button
           onClick={onCancel}
-          className="flex items-center gap-1.5 bg-white/10 hover:bg-white/15 border border-white/20 text-white/70 hover:text-white font-semibold px-4 sm:px-5 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm hover:shadow-lg active:scale-[0.97] text-sm"
+          className="flex items-center gap-1.5 bg-white/5 hover:bg-white/15 border border-white/15 text-white/60 hover:text-white font-semibold px-4 sm:px-5 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm hover:shadow-lg active:scale-[0.97] text-sm"
         >
           <svg
             className="w-4 h-4"

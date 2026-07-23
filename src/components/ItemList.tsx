@@ -1,6 +1,7 @@
 import { ShoppingItem } from '../types';
 import Item from './Item';
 import EditItem from './EditItem';
+import { ANIMATION } from '../config';
 
 interface ItemListProps {
   items: ShoppingItem[];
@@ -68,7 +69,7 @@ export default function ItemList({
       {items.map((item, index) => (
         <div
           key={item.id}
-          className={`animate-fade-in-up stagger-${Math.min(index + 1, 6)}`}
+          className={`animate-fade-in-up stagger-${Math.min(index + 1, ANIMATION.STAGGER_MAX)}`}
           style={{ animationFillMode: 'both' }}
         >
           {editingId === item.id ? (

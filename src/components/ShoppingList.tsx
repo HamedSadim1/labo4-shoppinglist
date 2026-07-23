@@ -1,13 +1,14 @@
 import { useState, useMemo } from 'react';
 import { ShoppingItem, ShoppingListFilter, SortOption } from '../types';
 import { useLocalStorage } from '../hooks';
+import { STORAGE_KEYS } from '../config';
 import AddItemForm from './AddItemForm';
 import ItemFilters from './ItemFilters';
 import ItemStats from './ItemStats';
 import ItemList from './ItemList';
 
 export default function ShoppingList() {
-  const [items, setItems] = useLocalStorage<ShoppingItem[]>('shoppingList', []);
+  const [items, setItems] = useLocalStorage<ShoppingItem[]>(STORAGE_KEYS.SHOPPING_LIST, []);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filter, setFilter] = useState<ShoppingListFilter | string>('all');
   const [sortBy, setSortBy] = useState<SortOption>('default');

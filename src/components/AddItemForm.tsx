@@ -1,6 +1,9 @@
 import { useState, useRef } from 'react';
 import { generate } from 'shortid';
-import { ShoppingItem, categories } from '../types';
+import { ShoppingItem } from '../types';
+import AmountInput from './ui/AmountInput';
+import CategorySelect from './ui/CategorySelect';
+import { DEFAULTS, INPUT } from '../config';
 
 interface AddItemFormProps {
   onAddItem: (item: ShoppingItem) => void;
@@ -8,8 +11,8 @@ interface AddItemFormProps {
 
 export default function AddItemForm({ onAddItem }: AddItemFormProps) {
   const [name, setName] = useState('');
-  const [amount, setAmount] = useState(1);
-  const [category, setCategory] = useState('General');
+  const [amount, setAmount] = useState<number>(DEFAULTS.AMOUNT);
+  const [category, setCategory] = useState<string>(DEFAULTS.CATEGORY);
   const [isFocused, setIsFocused] = useState(false);
   const [shakeKey, setShakeKey] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -33,8 +36,8 @@ export default function AddItemForm({ onAddItem }: AddItemFormProps) {
 
     onAddItem(newItem);
     setName('');
-    setAmount(1);
-    setCategory('General');
+    setAmount(DEFAULTS.AMOUNT);
+    setCategory(DEFAULTS.CATEGORY);
     inputRef.current?.focus();
   };
 
@@ -61,52 +64,27 @@ export default function AddItemForm({ onAddItem }: AddItemFormProps) {
               onBlur={() => setIsFocused(false)}
               className={`w-full px-4 py-3 bg-white/10 border rounded-xl text-white placeholder-white/40 focus:outline-none transition-all duration-200 backdrop-blur-sm ${
                 isFocused
-                  ? 'border-white/60 ring-2 ring-white/20'
+                  ? 'border-purple-400/50 ring-2 ring-purple-400/15'
                   : 'border-white/20 hover:border-white/30'
               }`}
-              maxLength={100}
+              maxLength={INPUT.MAX_LENGTH}
             />
             {name.length > 0 && (
               <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-white/30">
-                {name.length}/100
+                {name.length}/{INPUT.MAX_LENGTH}
               </span>
             )}
           </div>
 
           <div className="flex gap-3">
-            <div className="relative w-24">
-              <input
-                type="number"
-                min="1"
-                max="999"
-                value={amount}
-                onChange={(e) =>
-                  setAmount(Math.min(999, Math.max(1, parseInt(e.target.value) || 1)))
-                }
-                className="w-full px-3 py-3 bg-white/10 border border-white/20 hover:border-white/30 rounded-xl text-white text-center focus:outline-none focus:border-white/60 focus:ring-2 focus:ring-white/20 transition-all duration-200 backdrop-blur-sm [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-              />
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-white/40 text-sm">
-                ×
-              </span>
-            </div>
-
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="px-3 py-3 bg-white/10 border border-white/20 hover:border-white/30 rounded-xl text-white focus:outline-none focus:border-white/60 focus:ring-2 focus:ring-white/20 transition-all duration-200 backdrop-blur-sm cursor-pointer min-w-[120px]"
-            >
-              {categories.map((cat) => (
-                <option key={cat.id} value={cat.id} className="bg-gray-800 text-white">
-                  {cat.emoji} {cat.label}
-                </option>
-              ))}
-            </select>
+            <AmountInput value={amount} onChange={setAmount} />
+            <CategorySelect value={category} onChange={setCategory} />
           </div>
         </div>
 
         <button
           type="submit"
-          className="w-full sm:w-auto bg-gradient-to-r from-white/20 to-white/10 hover:from-white/30 hover:to-white/20 border border-white/30 text-white font-semibold py-3 px-8 rounded-xl transition-all duration-200 backdrop-blur-sm hover:shadow-xl active:scale-[0.98] flex items-center justify-center gap-2 group"
+          className="w-full sm:w-auto bg-gradient-to-r from-purple-500/30 to-pink-500/30 hover:from-purple-500/40 hover:to-pink-500/40 border border-purple-400/30 text-purple-100 font-semibold py-3 px-8 rounded-xl transition-all duration-200 backdrop-blur-sm hover:shadow-xl hover:shadow-purple-500/20 active:scale-[0.98] flex items-center justify-center gap-2 group"
         >
           <span>Add to List</span>
           <span className="group-hover:translate-x-0.5 transition-transform">→</span>

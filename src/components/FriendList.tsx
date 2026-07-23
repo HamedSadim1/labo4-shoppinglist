@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { generate } from 'shortid';
+import { FRIEND_LIST } from '../config';
 
 export default function FriendList() {
   const [name, setName] = useState('');
@@ -11,11 +12,10 @@ export default function FriendList() {
 
   function addFriend() {
     if (!name.trim()) return;
-    const insertAt = 1;
     const nextFriends = [
-      ...friends.slice(0, insertAt),
+      ...friends.slice(0, FRIEND_LIST.INSERT_AT),
       { id: generate(), name: name.trim() },
-      ...friends.slice(insertAt),
+      ...friends.slice(FRIEND_LIST.INSERT_AT),
     ];
     setFriends(nextFriends);
     setName('');
