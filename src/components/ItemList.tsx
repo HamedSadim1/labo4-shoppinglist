@@ -1,6 +1,6 @@
-import { ShoppingItem } from "../types";
-import Item from "./Item";
-import EditItem from "./EditItem";
+import { ShoppingItem } from '../types';
+import Item from './Item';
+import EditItem from './EditItem';
 
 interface ItemListProps {
   items: ShoppingItem[];
@@ -8,12 +8,7 @@ interface ItemListProps {
   filter: string;
   onToggleComplete: (id: string) => void;
   onEdit: (id: string) => void;
-  onSaveEdit: (
-    id: string,
-    name: string,
-    amount: number,
-    category: string
-  ) => void;
+  onSaveEdit: (id: string, name: string, amount: number, category: string) => void;
   onCancelEdit: () => void;
   onRemove: (id: string) => void;
 }
@@ -32,7 +27,7 @@ export default function ItemList({
     return (
       <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-8 text-center shadow-xl">
         <p className="text-white/60 drop-shadow-md text-lg">
-          {filter === "all" ? "No items yet. Add some!" : `No ${filter} items.`}
+          {filter === 'all' ? 'No items yet. Add some!' : `No ${filter} items.`}
         </p>
       </div>
     );
@@ -42,12 +37,7 @@ export default function ItemList({
     <div className="space-y-3">
       {items.map((item) =>
         editingId === item.id ? (
-          <EditItem
-            key={item.id}
-            item={item}
-            onSave={onSaveEdit}
-            onCancel={onCancelEdit}
-          />
+          <EditItem key={item.id} item={item} onSave={onSaveEdit} onCancel={onCancelEdit} />
         ) : (
           <Item
             key={item.id}
@@ -56,7 +46,7 @@ export default function ItemList({
             onEdit={onEdit}
             onRemove={onRemove}
           />
-        )
+        ),
       )}
     </div>
   );

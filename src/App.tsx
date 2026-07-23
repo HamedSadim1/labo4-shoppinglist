@@ -1,5 +1,5 @@
-import ShoppingList from "./components/ShoppingList";
-import Header from "./components/Header";
+import ShoppingList from './components/ShoppingList';
+import Header from './components/Header';
 
 function App() {
   return (
@@ -12,10 +12,7 @@ function App() {
       </div>
 
       <div className="relative z-10 container mx-auto px-4 py-8">
-        <Header
-          title="🛒 Shopping List"
-          subtitle="Organize your shopping efficiently"
-        />
+        <Header title="🛒 Shopping List" subtitle="Organize your shopping efficiently" />
         <ShoppingList />
       </div>
     </div>

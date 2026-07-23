@@ -1,6 +1,6 @@
-import React, { useState } from "react";
-import { produce } from "immer";
-import { generate } from "shortid";
+import React, { useState } from 'react';
+import { produce } from 'immer';
+import { generate } from 'shortid';
 
 interface Person {
   id: string;
@@ -9,9 +9,7 @@ interface Person {
 }
 
 const People = () => {
-  const [people, setPeople] = useState<Person[]>([
-    { id: "", firstName: "", lastName: "" },
-  ]);
+  const [people, setPeople] = useState<Person[]>([{ id: '', firstName: '', lastName: '' }]);
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
     const firstName = e.currentTarget.value;
@@ -22,15 +20,15 @@ const People = () => {
   };
 
   return (
-    <div style={{ textAlign: "center" }}>
+    <div style={{ textAlign: 'center' }}>
       <button
         onClick={() => {
           setPeople((currentPeople) => [
             ...currentPeople,
             {
               id: generate(),
-              firstName: "",
-              lastName: "",
+              firstName: '',
+              lastName: '',
             },
           ]);
         }}
@@ -48,7 +46,7 @@ const People = () => {
                   setPeople((currentPeople) =>
                     produce(currentPeople, (v) => {
                       v[index].firstName = firstName;
-                    })
+                    }),
                   );
                 }}
                 placeholder="first name"
@@ -62,15 +60,13 @@ const People = () => {
                   setPeople((currentPeople) =>
                     produce(currentPeople, (v) => {
                       v[index].lastName = lastName;
-                    })
+                    }),
                   );
                 }}
               />
               <button
                 onClick={() => {
-                  setPeople((currentPeople) =>
-                    currentPeople.filter((x) => x.id !== p.id)
-                  );
+                  setPeople((currentPeople) => currentPeople.filter((x) => x.id !== p.id));
                 }}
               >
                 Remove
