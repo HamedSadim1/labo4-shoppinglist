@@ -75,10 +75,31 @@ export const categories: CategoryInfo[] = [
   },
 ];
 
-export const categoryMap = Object.fromEntries(categories.map((c) => [c.id, c])) as Record<
+// Internal lookup. Don't import this directly — call `getCategoryInfo(id)` so
+// the sanitised fallback path (FALLBACK_CATEGORY) is always taken for
+// unknown ids. Keeping `categoryMap` module-private is the SSOT guarantee.
+const categoryMap = Object.fromEntries(categories.map((c) => [c.id, c])) as Record<
   string,
   CategoryInfo
 >;
+
+/**
+ * Single source of truth for "we don't recognise this category id".
+ * Returned by `getCategoryInfo` so consumer call sites can treat the result
+ * as a fully-populated `CategoryInfo` without inline `??` chains.
+ */
+export const FALLBACK_CATEGORY: CategoryInfo = {
+  id: 'Other',
+  label: 'Other',
+  emoji: '📦',
+  color: 'text-white/80',
+  bg: 'bg-white/10',
+  border: 'border-white/20',
+};
+
+export function getCategoryInfo(categoryId: string): CategoryInfo {
+  return categoryMap[categoryId] ?? FALLBACK_CATEGORY;
+}
 
 export type ShoppingListFilter = 'all' | 'pending' | 'completed';
 

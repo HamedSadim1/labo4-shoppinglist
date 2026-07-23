@@ -109,6 +109,73 @@
   }
 }
 
+@keyframes checkmark-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-checkmark-draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: checkmark-draw 0.32s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+}
+
+@keyframes highlight-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.55);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(168, 85, 247, 0);
+    transform: scale(1.015);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
+    transform: scale(1);
+  }
+}
+
+.animate-highlight-pulse {
+  animation: highlight-pulse 1.4s ease-out 1;
+}
+
+@keyframes celebrate-pop {
+  0% {
+    transform: scale(0.6) rotate(-4deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.2) rotate(3deg);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+.animate-celebrate-pop {
+  animation: celebrate-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes celebrate-progress {
+  0%,
+  100% {
+    box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(236, 72, 153, 0.55);
+  }
+}
+
+.animate-celebrate-progress {
+  animation: celebrate-progress 1.8s ease-in-out infinite;
+}
+
 .animate-blob {
   animation: blob 10s infinite;
 }
@@ -123,6 +190,14 @@
 
 .animate-fade-in-up {
   animation: fadeInUp 0.4s ease-out forwards;
+  /*
+   * Per-row stagger delay: a CSS variable overrides the default of 0 so
+   * the element animates immediately. ItemList.tsx supplies
+   * `--stagger-index` (clamped to ANIMATION.STAGGER_MAX) and
+   * `--stagger-step` (from ANIMATION.STAGGER_STEP_S). This is the only
+   * place that converts those into a delay — see config.ts for the SSOT.
+   */
+  animation-delay: calc(var(--stagger-index, 0) * var(--stagger-step, 0.05s));
 }
 
 .animate-fade-in {
@@ -143,25 +218,6 @@
 
 .animate-pulse-glow {
   animation: pulse-glow 2s ease-in-out infinite;
-}
-
-.stagger-1 {
-  animation-delay: 0.05s;
-}
-.stagger-2 {
-  animation-delay: 0.1s;
-}
-.stagger-3 {
-  animation-delay: 0.15s;
-}
-.stagger-4 {
-  animation-delay: 0.2s;
-}
-.stagger-5 {
-  animation-delay: 0.25s;
-}
-.stagger-6 {
-  animation-delay: 0.3s;
 }
 
 /* Custom scrollbar */

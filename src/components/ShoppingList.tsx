@@ -1,7 +1,11 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ShoppingItem, ShoppingListFilter, SortOption } from '../types';
 import { useLocalStorage } from '../hooks';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { useToast } from '../hooks/useToast';
 import { STORAGE_KEYS } from '../config';
+import { AlertTriangleIcon, SearchIcon, XIcon } from './ui/icons';
+import Card from './ui/Card';
 import AddItemForm from './AddItemForm';
 import ItemFilters from './ItemFilters';
 import ItemStats from './ItemStats';
@@ -14,9 +18,16 @@ export default function ShoppingList() {
   const [sortBy, setSortBy] = useState<SortOption>('default');
   const [searchQuery, setSearchQuery] = useState('');
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [lastAddedId, setLastAddedId] = useState<string | null>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
+  const highlightTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const { push } = useToast();
 
   const addItem = (item: ShoppingItem) => {
     setItems([item, ...items]);
+    setLastAddedId(item.id);
+    if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current);
+    highlightTimerRef.current = setTimeout(() => setLastAddedId(null), 1500);
   };
 
   const toggleComplete = (id: string) => {
@@ -43,14 +54,55 @@ export default function ShoppingList() {
   };
 
   const clearCompleted = () => {
+    const count = items.filter((item) => item.completed).length;
     setItems(items.filter((item) => !item.completed));
     setShowClearConfirm(false);
+    if (count > 0) {
+      push(
+        count === 1 ? 'Cleared 1 completed item' : `Cleared ${count} completed items`,
+        'success',
+      );
+    }
   };
+
+  // Cancel any pending highlight timer when the list unmounts so we don't fire
+  // setState on an unmounted node (e.g. HMR or route changes).
+  useEffect(() => {
+    return () => {
+      if (highlightTimerRef.current) {
+        clearTimeout(highlightTimerRef.current);
+        highlightTimerRef.current = null;
+      }
+    };
+  }, []);
+
+  // One global keydown listener. Escape is dispatched through the priority
+  // chain in order: clear-confirm dialog → editing → search-clear.
+  useKeyboardShortcuts({
+    searchRef,
+    searchQuery,
+    setSearchQuery,
+    escapes: [
+      () => {
+        if (showClearConfirm) {
+          setShowClearConfirm(false);
+          return true;
+        }
+        return false;
+      },
+      () => {
+        if (editingId) {
+          cancelEdit();
+          return true;
+        }
+        return false;
+      },
+    ],
+  });
 
   const filteredItems = useMemo(() => {
     let result = [...items];
 
-    // Filter by status/category
     if (filter === 'completed') {
       result = result.filter((item) => item.completed);
     } else if (filter === 'pending') {
@@ -59,7 +111,6 @@ export default function ShoppingList() {
       result = result.filter((item) => item.category === filter);
     }
 
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       result = result.filter(
@@ -68,7 +119,6 @@ export default function ShoppingList() {
       );
     }
 
-    // Sort
     if (sortBy === 'name') {
       result.sort((a, b) => a.name.localeCompare(b.name));
     } else if (sortBy === 'category') {
@@ -78,7 +128,6 @@ export default function ShoppingList() {
         (a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime(),
       );
     } else {
-      // Default: pending first, then by creation date
       result.sort((a, b) => {
         if (a.completed !== b.completed) return a.completed ? 1 : -1;
         return 0;
@@ -95,57 +144,40 @@ export default function ShoppingList() {
     <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 animate-fade-in-up">
       <AddItemForm onAddItem={addItem} />
 
-      {/* Stats & Filters card */}
-      <div className="glass-strong rounded-2xl p-4 sm:p-6 shadow-2xl animate-fade-in-up">
+      <Card variant="strong" padding="p-4 sm:p-6">
         <ItemStats
           totalItems={totalItems}
           completedItems={completedItems}
           onClearCompleted={() => setShowClearConfirm(true)}
         />
 
-        {/* Search + Sort row */}
         <div className="flex flex-col sm:flex-row gap-3 mb-4">
-          {/* Search */}
           <div className="relative flex-1">
-            <svg
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+            <SearchIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/30" />
             <input
+              ref={searchRef}
               type="text"
               placeholder="Search items..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-8 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 transition-all duration-200 backdrop-blur-sm"
+              className="w-full pl-9 pr-16 py-2 bg-white/5 border border-white/10 rounded-xl text-white placeholder-white/30 text-sm focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 transition-all duration-200 backdrop-blur-sm"
             />
+            {!searchQuery && (
+              <kbd className="absolute right-2.5 top-1/2 -translate-y-1/2 px-1.5 py-0.5 rounded text-[10px] text-white/40 border border-white/10 bg-white/5 font-mono pointer-events-none">
+                /
+              </kbd>
+            )}
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
                 className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/30 hover:text-white/60 transition-colors"
+                aria-label="Clear search"
               >
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
+                <XIcon className="w-4 h-4" />
               </button>
             )}
           </div>
 
-          {/* Sort */}
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
@@ -167,14 +199,14 @@ export default function ShoppingList() {
         </div>
 
         <ItemFilters filter={filter} onFilterChange={setFilter} />
-      </div>
+      </Card>
 
-      {/* List */}
       <ItemList
         items={filteredItems}
         editingId={editingId}
         filter={filter}
         searchQuery={searchQuery}
+        highlightedId={lastAddedId}
         onToggleComplete={toggleComplete}
         onEdit={startEdit}
         onSaveEdit={saveEdit}
@@ -182,27 +214,26 @@ export default function ShoppingList() {
         onRemove={removeItem}
       />
 
-      {/* Clear all completed confirmation dialog */}
       {showClearConfirm && completedItems > 0 && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm animate-fade-in">
-          <div className="glass-strong rounded-2xl p-6 sm:p-8 max-w-sm w-full shadow-2xl animate-scale-in">
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm animate-fade-in"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="clear-confirm-title"
+        >
+          <Card
+            variant="strong"
+            padding="p-6 sm:p-8"
+            animation="scale-in"
+            className="max-w-sm w-full"
+          >
             <div className="text-center mb-6">
               <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-red-500/20 border border-red-400/30 mb-4">
-                <svg
-                  className="w-7 h-7 text-red-300"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z"
-                  />
-                </svg>
+                <AlertTriangleIcon className="w-7 h-7 text-red-300" />
               </div>
-              <h3 className="text-lg font-bold text-white mb-1">Clear completed items?</h3>
+              <h3 id="clear-confirm-title" className="text-lg font-bold text-white mb-1">
+                Clear completed items?
+              </h3>
               <p className="text-white/50 text-sm">
                 This will permanently remove {completedItems} completed item
                 {completedItems !== 1 ? 's' : ''} from your list.
@@ -222,7 +253,7 @@ export default function ShoppingList() {
                 Cancel
               </button>
             </div>
-          </div>
+          </Card>
         </div>
       )}
     </div>

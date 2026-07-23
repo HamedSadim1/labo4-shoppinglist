@@ -1,6 +1,6 @@
-import { ShoppingItem } from '../types';
-import { categoryMap } from '../types';
+import { ShoppingItem, getCategoryInfo } from '../types';
 import IconButton from './ui/IconButton';
+import { CheckIcon, EditIcon, TrashIcon } from './ui/icons';
 
 interface ItemProps {
   item: ShoppingItem;
@@ -9,48 +9,8 @@ interface ItemProps {
   onRemove: (id: string) => void;
 }
 
-function EditIcon() {
-  return (
-    <svg
-      className="w-4 h-4 sm:w-5 sm:h-5"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
-      />
-    </svg>
-  );
-}
-
-function DeleteIcon() {
-  return (
-    <svg
-      className="w-4 h-4 sm:w-5 sm:h-5"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-      />
-    </svg>
-  );
-}
-
 export default function Item({ item, onToggleComplete, onEdit, onRemove }: ItemProps) {
-  const cat = categoryMap[item.category];
-  const categoryColor = cat?.color ?? 'text-white/80';
-  const categoryBg = cat?.bg ?? 'bg-white/10';
-  const categoryBorder = cat?.border ?? 'border-white/20';
-  const categoryEmoji = cat?.emoji ?? '📦';
+  const cat = getCategoryInfo(item.category);
 
   return (
     <div
@@ -68,17 +28,15 @@ export default function Item({ item, onToggleComplete, onEdit, onRemove }: ItemP
                 : 'bg-white/10 border-white/30 hover:bg-white/20 hover:border-white/50'
             }`}
             aria-label={item.completed ? 'Mark as incomplete' : 'Mark as complete'}
+            aria-pressed={item.completed}
           >
             {item.completed && (
-              <svg
-                className="absolute inset-0 w-full h-full text-purple-200 p-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
+              <CheckIcon
                 strokeWidth={3}
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
+                pathLength={1}
+                pathClassName="animate-checkmark-draw"
+                className="absolute inset-0 w-full h-full text-purple-100 p-1"
+              />
             )}
           </button>
 
@@ -96,18 +54,17 @@ export default function Item({ item, onToggleComplete, onEdit, onRemove }: ItemP
               </span>
             </div>
             <span
-              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${categoryBg} ${categoryColor} ${categoryBorder} border mt-1 backdrop-blur-sm`}
+              className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium ${cat.bg} ${cat.color} ${cat.border} border mt-1 backdrop-blur-sm`}
             >
-              <span>{categoryEmoji}</span>
+              <span>{cat.emoji}</span>
               <span>{item.category}</span>
             </span>
           </div>
         </div>
 
-        {/* Action buttons - responsive: desktop hover reveal, always visible on mobile */}
         <div className="flex items-center gap-0.5 sm:opacity-0 sm:group-hover:opacity-100 transition-all duration-200">
           <IconButton onClick={() => onEdit(item.id)} label="Edit item" title="Edit item">
-            <EditIcon />
+            <EditIcon className="w-4 h-4 sm:w-5 sm:h-5" />
           </IconButton>
           <IconButton
             onClick={() => onRemove(item.id)}
@@ -115,7 +72,7 @@ export default function Item({ item, onToggleComplete, onEdit, onRemove }: ItemP
             title="Remove item"
             variant="danger"
           >
-            <DeleteIcon />
+            <TrashIcon className="w-4 h-4 sm:w-5 sm:h-5" />
           </IconButton>
         </div>
       </div>

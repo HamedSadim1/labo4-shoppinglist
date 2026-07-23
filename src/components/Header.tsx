@@ -1,3 +1,5 @@
+import Card from './ui/Card';
+
 export default function Header() {
   const today = new Date().toLocaleDateString('nl-NL', {
     weekday: 'long',
@@ -8,7 +10,12 @@ export default function Header() {
 
   return (
     <header className="text-center mb-6 animate-fade-in-up">
-      <div className="glass-strong rounded-2xl sm:rounded-3xl p-6 sm:p-10 shadow-2xl">
+      <Card
+        variant="strong"
+        rounding="rounded-2xl sm:rounded-3xl"
+        padding="p-6 sm:p-10"
+        animation={false}
+      >
         <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 border border-white/20 mb-4 sm:mb-5">
           <span className="text-3xl sm:text-4xl">🛒</span>
         </div>
@@ -22,7 +29,7 @@ export default function Header() {
           <span>📅</span>
           <span className="capitalize">{today}</span>
         </div>
-      </div>
+      </Card>
     </header>
   );
 }

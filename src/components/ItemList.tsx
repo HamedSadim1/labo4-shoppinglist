@@ -1,4 +1,6 @@
+import type { CSSProperties } from 'react';
 import { ShoppingItem } from '../types';
+import Card from './ui/Card';
 import Item from './Item';
 import EditItem from './EditItem';
 import { ANIMATION } from '../config';
@@ -8,6 +10,7 @@ interface ItemListProps {
   editingId: string | null;
   filter: string;
   searchQuery: string;
+  highlightedId?: string | null;
   onToggleComplete: (id: string) => void;
   onEdit: (id: string) => void;
   onSaveEdit: (id: string, name: string, amount: number, category: string) => void;
@@ -39,13 +42,19 @@ function EmptyState({ filter, searchQuery }: { filter: string; searchQuery: stri
   }
 
   return (
-    <div className="glass rounded-2xl p-10 sm:p-14 text-center animate-scale-in">
+    <Card
+      variant="soft"
+      padding="p-10 sm:p-14"
+      animation="scale-in"
+      shadow={false}
+      className="text-center"
+    >
       <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/5 border border-white/10 mb-5">
         <span className="text-4xl sm:text-5xl">{emoji}</span>
       </div>
       <h3 className="text-xl sm:text-2xl font-bold text-white/80 mb-2">{title}</h3>
       <p className="text-white/50 max-w-xs mx-auto">{description}</p>
-    </div>
+    </Card>
   );
 }
 
@@ -54,6 +63,7 @@ export default function ItemList({
   editingId,
   filter,
   searchQuery,
+  highlightedId,
   onToggleComplete,
   onEdit,
   onSaveEdit,
@@ -66,13 +76,10 @@ export default function ItemList({
 
   return (
     <div className="space-y-2 sm:space-y-3">
-      {items.map((item, index) => (
-        <div
-          key={item.id}
-          className={`animate-fade-in-up stagger-${Math.min(index + 1, ANIMATION.STAGGER_MAX)}`}
-          style={{ animationFillMode: 'both' }}
-        >
-          {editingId === item.id ? (
+      {items.map((item, index) => {
+        const isHighlighted = highlightedId === item.id;
+        const body =
+          editingId === item.id ? (
             <EditItem key={item.id} item={item} onSave={onSaveEdit} onCancel={onCancelEdit} />
           ) : (
             <Item
@@ -81,9 +88,24 @@ export default function ItemList({
               onEdit={onEdit}
               onRemove={onRemove}
             />
-          )}
-        </div>
-      ))}
+          );
+
+        // Single source of truth: see config.ts -> ANIMATION.
+        const staggerStyle = {
+          '--stagger-index': Math.min(index + 1, ANIMATION.STAGGER_MAX),
+          '--stagger-step': `${ANIMATION.STAGGER_STEP_S}s`,
+        } as CSSProperties;
+
+        return (
+          <div
+            key={item.id}
+            className="animate-fade-in-up"
+            style={{ animationFillMode: 'both', ...staggerStyle }}
+          >
+            {isHighlighted ? <div className="animate-highlight-pulse">{body}</div> : body}
+          </div>
+        );
+      })}
     </div>
   );
 }
