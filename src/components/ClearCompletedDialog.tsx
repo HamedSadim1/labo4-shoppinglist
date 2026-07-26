@@ -1,6 +1,6 @@
 import Button from './ui/Button';
+import Dialog from './ui/Dialog';
 import { AlertTriangleIcon } from './ui/icons';
-import Card from './ui/Card';
 
 interface ClearCompletedDialogProps {
   /** Whether the modal is visible. */
@@ -9,7 +9,7 @@ interface ClearCompletedDialogProps {
   completedCount: number;
   /** Called when the user clicks "Yes, clear all". */
   onConfirm: () => void;
-  /** Called when the user clicks "Cancel" or hits Esc (via the global hook). */
+  /** Called when the user clicks "Cancel" or hits Esc / backdrop / close button. */
   onCancel: () => void;
 }
 
@@ -25,35 +25,33 @@ export default function ClearCompletedDialog({
 }: ClearCompletedDialogProps) {
   if (!open || completedCount === 0) return null;
 
+  const itemCountLabel = `${completedCount} completed item${completedCount !== 1 ? 's' : ''}`;
+
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm animate-fade-in"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="clear-confirm-title"
+    <Dialog
+      open={open}
+      onClose={onCancel}
+      title="Clear completed items?"
+      description={`This will permanently remove ${itemCountLabel} from your list.`}
+      maxWidth="max-w-md"
     >
-      <Card variant="strong" padding="p-6 sm:p-8" animation="scale-in" className="max-w-sm w-full">
-        <div className="text-center mb-6">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-red-500/20 border border-red-400/30 mb-4">
-            <AlertTriangleIcon className="w-7 h-7 text-red-300" />
-          </div>
-          <h3 id="clear-confirm-title" className="text-lg font-bold text-white mb-1">
-            Clear completed items?
-          </h3>
-          <p className="text-white/50 text-sm">
-            This will permanently remove {completedCount} completed item
-            {completedCount !== 1 ? 's' : ''} from your list.
-          </p>
+      <div className="flex flex-col sm:flex-row items-center gap-4 mb-6 p-4 rounded-xl bg-red-500/10 border border-red-400/20">
+        <div className="shrink-0 inline-flex items-center justify-center w-12 h-12 rounded-full bg-red-500/20 border border-red-400/30">
+          <AlertTriangleIcon className="w-6 h-6 text-red-300" />
         </div>
-        <div className="flex gap-3">
-          <Button onClick={onConfirm} variant="danger" size="sm" className="flex-1 py-2.5">
-            Yes, clear all
-          </Button>
-          <Button onClick={onCancel} variant="secondary" size="sm" className="flex-1 py-2.5">
-            Cancel
-          </Button>
-        </div>
-      </Card>
-    </div>
+        <p className="text-red-100/90 text-sm text-center sm:text-left">
+          You are about to delete {itemCountLabel}. This action cannot be undone.
+        </p>
+      </div>
+
+      <div className="flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+        <Button onClick={onCancel} variant="secondary" size="sm" className="w-full sm:w-auto">
+          Cancel
+        </Button>
+        <Button onClick={onConfirm} variant="danger" size="sm" className="w-full sm:w-auto">
+          Yes, clear all
+        </Button>
+      </div>
+    </Dialog>
   );
 }

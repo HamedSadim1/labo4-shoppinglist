@@ -51,13 +51,6 @@ export default function ShoppingList() {
     setSearchQuery,
     escapes: [
       () => {
-        if (showClearConfirm) {
-          cancelClear();
-          return true;
-        }
-        return false;
-      },
-      () => {
         if (editingId) {
           cancelEdit();
           return true;
