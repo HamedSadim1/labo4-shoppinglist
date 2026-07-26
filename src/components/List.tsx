@@ -1,5 +1,9 @@
-import { produce } from 'immer';
-import React, { useState } from 'react';
+import React from 'react';
+import { useList } from '../hooks/useList';
+import Button from './ui/Button';
+import Card from './ui/Card';
+import PageContainer from './ui/PageContainer';
+import TextInput from './ui/TextInput';
 
 interface ListItem {
   firstName: string;
@@ -7,7 +11,7 @@ interface ListItem {
 }
 
 const List = () => {
-  const [list, setList] = useState<ListItem[]>([{ firstName: '', email: '' }]);
+  const { items: list, add, update } = useList<ListItem>([{ firstName: '', email: '' }]);
 
   const addListItem: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -15,67 +19,61 @@ const List = () => {
     const firstName = formData.get('firstName') as string;
     const email = formData.get('email') as string;
     if (firstName || email) {
-      setList([...list, { firstName, email }]);
+      add({ firstName, email });
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 space-y-4">
+    <PageContainer>
       <h2 className="text-2xl font-bold text-white">List Manager</h2>
       {list.map((item, index) => (
-        <div key={index} className="glass rounded-xl p-4 space-y-3">
+        <Card
+          key={index}
+          padding="p-4"
+          rounding="rounded-xl"
+          shadow={false}
+          animation={false}
+          className="space-y-3"
+        >
           <form onSubmit={addListItem} className="space-y-2">
             <div>
               <label htmlFor={`firstName-${index}`} className="block text-sm text-white/60 mb-1">
                 First Name
-              </label>
-              <input
+              </label>{' '}
+              <TextInput
                 type="text"
                 id={`firstName-${index}`}
                 name="firstName"
                 value={item.firstName}
                 onChange={(e) => {
-                  const val = e.target.value;
-                  setList((currentPeople) =>
-                    produce(currentPeople, (v) => {
-                      v[index].firstName = val;
-                    }),
-                  );
+                  update(index, { firstName: e.target.value });
                 }}
-                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+                className="w-full"
               />
             </div>
             <div>
               <label htmlFor={`email-${index}`} className="block text-sm text-white/60 mb-1">
                 Email
-              </label>
-              <input
+              </label>{' '}
+              <TextInput
                 type="email"
                 id={`email-${index}`}
                 name="email"
                 value={item.email}
                 onChange={(e) => {
-                  const val = e.target.value;
-                  setList((currentPeople) =>
-                    produce(currentPeople, (v) => {
-                      v[index].email = val;
-                    }),
-                  );
+                  update(index, { email: e.target.value });
                 }}
-                className="w-full px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+                className="w-full"
               />
             </div>
-            <button
-              type="submit"
-              className="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg transition-all duration-200"
-            >
+            <Button type="submit" variant="ghost" size="md">
               Add product
-            </button>
+            </Button>
           </form>
-        </div>
+        </Card>
       ))}
       {list.length > 0 && (
-        <div className="glass rounded-xl p-4">
+        <Card padding="p-4" rounding="rounded-xl" shadow={false} animation={false}>
           <h3 className="text-sm font-medium text-white/50 mb-2">Items:</h3>
           <ul className="space-y-1">
             {list.map((item, index) => (
@@ -86,9 +84,9 @@ const List = () => {
               </li>
             ))}
           </ul>
-        </div>
+        </Card>
       )}
-    </div>
+    </PageContainer>
   );
 };
 

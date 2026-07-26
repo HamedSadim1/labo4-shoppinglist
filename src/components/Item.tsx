@@ -1,4 +1,5 @@
 import { ShoppingItem, getCategoryInfo } from '../types';
+import Card from './ui/Card';
 import IconButton from './ui/IconButton';
 import { CheckIcon, EditIcon, TrashIcon } from './ui/icons';
 
@@ -13,10 +14,14 @@ export default function Item({ item, onToggleComplete, onEdit, onRemove }: ItemP
   const cat = getCategoryInfo(item.category);
 
   return (
-    <div
-      className={`glass rounded-xl sm:rounded-2xl p-3 sm:p-4 transition-all duration-300 hover:shadow-xl hover:scale-[1.01] group animate-slide-in border border-white/10 hover:border-white/20 ${
-        item.completed ? 'opacity-60' : ''
-      }`}
+    <Card
+      variant="soft"
+      padding="p-3 sm:p-4"
+      rounding="rounded-xl sm:rounded-2xl"
+      animation="slide-in"
+      shadow={false}
+      interactive
+      className={item.completed ? 'opacity-60' : ''}
     >
       <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 flex-1 min-w-0">
@@ -76,6 +81,6 @@ export default function Item({ item, onToggleComplete, onEdit, onRemove }: ItemP
           </IconButton>
         </div>
       </div>
-    </div>
+    </Card>
   );
 }

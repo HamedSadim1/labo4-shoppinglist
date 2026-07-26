@@ -1,6 +1,10 @@
 import { useState } from 'react';
 import { generate } from 'shortid';
 import { FRIEND_LIST } from '../config';
+import Button from './ui/Button';
+import Card from './ui/Card';
+import PageContainer from './ui/PageContainer';
+import TextInput from './ui/TextInput';
 
 export default function FriendList() {
   const [name, setName] = useState('');
@@ -28,37 +32,44 @@ export default function FriendList() {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 space-y-4">
+    <PageContainer>
       <h2 className="text-2xl font-bold text-white">Friend List</h2>
-      <div className="glass rounded-xl p-4 space-y-3">
+      <Card
+        padding="p-4"
+        rounding="rounded-xl"
+        shadow={false}
+        animation={false}
+        className="space-y-3"
+      >
         <p className="text-sm text-white/50">Inspiring sculptors:</p>
         <div className="flex gap-2">
-          <input
+          <TextInput
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Add a friend..."
-            className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+            className="flex-1"
           />
-          <button
-            onClick={addFriend}
-            disabled={!name.trim()}
-            className="bg-white/20 hover:bg-white/30 disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium px-4 py-2 rounded-lg transition-all duration-200"
-          >
+          <Button onClick={addFriend} disabled={!name.trim()} variant="ghost" size="md">
             Insert
-          </button>
+          </Button>
         </div>
-      </div>
+      </Card>
       <ul className="space-y-2">
         {friends.map((friend) => (
-          <li
+          <Card
             key={friend.id}
-            className="glass rounded-xl px-4 py-3 text-white/80 hover:bg-white/10 transition-colors"
+            as="li"
+            padding="px-4 py-3"
+            rounding="rounded-xl"
+            shadow={false}
+            animation={false}
+            className="text-white/80 hover:bg-white/10 transition-colors"
           >
             {friend.name}
-          </li>
+          </Card>
         ))}
       </ul>
-    </div>
+    </PageContainer>
   );
 }

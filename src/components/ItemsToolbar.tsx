@@ -1,5 +1,6 @@
 import type { RefObject } from 'react';
 import { ShoppingListFilter, SortOption } from '../types';
+import { SORT_OPTIONS } from '../config';
 import Card from './ui/Card';
 import { SearchIcon, XIcon } from './ui/icons';
 import ItemFilters from './ItemFilters';
@@ -75,18 +76,11 @@ export default function ItemsToolbar({
           onChange={(e) => onSortChange(e.target.value as SortOption)}
           className="px-3 py-2 bg-white/5 border border-white/10 rounded-xl text-white/70 text-sm focus:outline-none focus:border-white/30 focus:ring-2 focus:ring-white/10 transition-all duration-200 backdrop-blur-sm cursor-pointer"
         >
-          <option value="default" className="bg-gray-800 text-white">
-            Default order
-          </option>
-          <option value="name" className="bg-gray-800 text-white">
-            Sort by name
-          </option>
-          <option value="category" className="bg-gray-800 text-white">
-            Sort by category
-          </option>
-          <option value="created" className="bg-gray-800 text-white">
-            Newest first
-          </option>
+          {SORT_OPTIONS.map((opt) => (
+            <option key={opt.id} value={opt.id} className="bg-gray-800 text-white">
+              {opt.label}
+            </option>
+          ))}
         </select>
       </div>
 

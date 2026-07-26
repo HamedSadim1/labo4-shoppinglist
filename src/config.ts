@@ -85,11 +85,41 @@ export const DATE = {
 // ---------------------------------------------------------------------------
 // Filter options (used by ItemFilters for the "all / pending / completed"
 // pills next to the category chips).
+//
+// The `FILTER` object is the single source of truth for the raw filter ids.
+// `FILTER_OPTIONS` only adds presentation metadata (label/icon). Derive the
+// `ShoppingListFilter` type from `FILTER` so a string literal can never drift.
 // ---------------------------------------------------------------------------
+export const FILTER = {
+  ALL: 'all',
+  PENDING: 'pending',
+  COMPLETED: 'completed',
+} as const;
+
 export const FILTER_OPTIONS = [
-  { id: 'all', label: 'All', icon: '📋' },
-  { id: 'pending', label: 'Pending', icon: '⏳' },
-  { id: 'completed', label: 'Done', icon: '✅' },
+  { id: FILTER.ALL, label: 'All', icon: '📋' },
+  { id: FILTER.PENDING, label: 'Pending', icon: '⏳' },
+  { id: FILTER.COMPLETED, label: 'Done', icon: '✅' },
+] as const;
+
+// ---------------------------------------------------------------------------
+// Sort options
+//
+// Same SSOT pattern as filters: raw ids live in `SORT`, presentation labels
+// live in `SORT_OPTIONS`, and `SortOption` is derived from `SORT`.
+// ---------------------------------------------------------------------------
+export const SORT = {
+  DEFAULT: 'default',
+  NAME: 'name',
+  CATEGORY: 'category',
+  CREATED: 'created',
+} as const;
+
+export const SORT_OPTIONS = [
+  { id: SORT.DEFAULT, label: 'Default order' },
+  { id: SORT.NAME, label: 'Sort by name' },
+  { id: SORT.CATEGORY, label: 'Sort by category' },
+  { id: SORT.CREATED, label: 'Newest first' },
 ] as const;
 
 // ---------------------------------------------------------------------------

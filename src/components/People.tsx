@@ -1,6 +1,9 @@
-import { useState } from 'react';
-import { produce } from 'immer';
 import { generate } from 'shortid';
+import { useList } from '../hooks/useList';
+import Button from './ui/Button';
+import Card from './ui/Card';
+import PageContainer from './ui/PageContainer';
+import TextInput from './ui/TextInput';
 
 interface Person {
   id: string;
@@ -9,7 +12,12 @@ interface Person {
 }
 
 const People = () => {
-  const [people, setPeople] = useState<Person[]>([{ id: generate(), firstName: '', lastName: '' }]);
+  const {
+    items: people,
+    add,
+    remove,
+    update,
+  } = useList<Person>([{ id: generate(), firstName: '', lastName: '' }]);
 
   const handleSubmit: React.FormEventHandler<HTMLFormElement> = (e) => {
     e.preventDefault();
@@ -17,85 +25,78 @@ const People = () => {
     const firstName = formData.get('firstName') as string;
     const lastName = formData.get('lastName') as string;
     if (firstName && lastName) {
-      setPeople([...people, { id: generate(), firstName, lastName }]);
+      add({ id: generate(), firstName, lastName });
     }
   };
 
   return (
-    <div className="max-w-lg mx-auto p-6 space-y-4">
+    <PageContainer>
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-white">People</h2>
-        <button
+        <Button
           onClick={() => {
-            setPeople((currentPeople) => [
-              ...currentPeople,
-              { id: generate(), firstName: '', lastName: '' },
-            ]);
+            add({ id: generate(), firstName: '', lastName: '' });
           }}
-          className="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg transition-all duration-200"
+          variant="ghost"
+          size="md"
         >
           Add Person
-        </button>
+        </Button>
       </div>
 
       <div className="space-y-3">
         {people.map((p, index) => (
-          <div key={p.id} className="glass rounded-xl p-4 space-y-3">
+          <Card
+            key={p.id}
+            padding="p-4"
+            rounding="rounded-xl"
+            shadow={false}
+            animation={false}
+            className="space-y-3"
+          >
             <form onSubmit={handleSubmit} className="space-y-2">
               <div className="flex gap-2">
-                <input
+                <TextInput
                   value={p.firstName}
                   onChange={(e) => {
-                    const firstName = e.target.value;
-                    setPeople((currentPeople) =>
-                      produce(currentPeople, (v) => {
-                        v[index].firstName = firstName;
-                      }),
-                    );
+                    update(index, { firstName: e.target.value });
                   }}
                   placeholder="First name"
                   name="firstName"
-                  className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+                  className="flex-1"
                 />
-                <input
+                <TextInput
                   value={p.lastName}
                   placeholder="Last name"
                   name="lastName"
                   onChange={(e) => {
-                    const lastName = e.target.value;
-                    setPeople((currentPeople) =>
-                      produce(currentPeople, (v) => {
-                        v[index].lastName = lastName;
-                      }),
-                    );
+                    update(index, { lastName: e.target.value });
                   }}
-                  className="flex-1 px-3 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:border-white/40"
+                  className="flex-1"
                 />
               </div>
               <div className="flex gap-2">
-                <button
-                  type="submit"
-                  className="bg-white/20 hover:bg-white/30 text-white font-medium px-4 py-2 rounded-lg transition-all duration-200"
-                >
+                <Button type="submit" variant="ghost" size="md">
                   Add to Array
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => {
-                    setPeople((currentPeople) => currentPeople.filter((x) => x.id !== p.id));
+                    remove(index);
                   }}
-                  className="bg-red-500/20 hover:bg-red-500/30 text-red-200 font-medium px-4 py-2 rounded-lg transition-all duration-200"
+                  variant="ghost-danger"
+                  size="md"
                 >
                   Remove
-                </button>
+                </Button>
               </div>
             </form>
-          </div>
+          </Card>
         ))}
       </div>
 
       {people.length > 0 && (
-        <div className="glass rounded-xl p-4">
+        <Card padding="p-4" rounding="rounded-xl" shadow={false} animation={false}>
           <h3 className="text-sm font-medium text-white/50 mb-2">All People:</h3>
           <div className="space-y-1">
             {people.map((p, index) => (
@@ -104,7 +105,7 @@ const People = () => {
               </div>
             ))}
           </div>
-        </div>
+        </Card>
       )}
 
       <details className="glass rounded-xl p-4">
@@ -115,7 +116,7 @@ const People = () => {
           {JSON.stringify(people, null, 2)}
         </pre>
       </details>
-    </div>
+    </PageContainer>
   );
 };
 

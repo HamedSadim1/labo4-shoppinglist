@@ -1,3 +1,4 @@
+import Button from './ui/Button';
 import { AlertTriangleIcon } from './ui/icons';
 import Card from './ui/Card';
 
@@ -45,18 +46,12 @@ export default function ClearCompletedDialog({
           </p>
         </div>
         <div className="flex gap-3">
-          <button
-            onClick={onConfirm}
-            className="flex-1 bg-red-500/20 hover:bg-red-500/30 border border-red-400/30 text-red-200 font-semibold py-2.5 rounded-xl transition-all duration-200 active:scale-[0.98]"
-          >
+          <Button onClick={onConfirm} variant="danger" size="sm" className="flex-1 py-2.5">
             Yes, clear all
-          </button>
-          <button
-            onClick={onCancel}
-            className="flex-1 bg-white/10 hover:bg-white/15 border border-white/20 text-white/70 hover:text-white font-semibold py-2.5 rounded-xl transition-all duration-200 active:scale-[0.98]"
-          >
+          </Button>
+          <Button onClick={onCancel} variant="secondary" size="sm" className="flex-1 py-2.5">
             Cancel
-          </button>
+          </Button>
         </div>
       </Card>
     </div>

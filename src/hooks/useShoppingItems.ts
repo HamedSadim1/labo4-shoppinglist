@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { ShoppingItem, ShoppingListFilter, SortOption } from '../types';
 import { useLocalStorage } from '../hooks';
-import { ANIMATION, STORAGE_KEYS } from '../config';
+import { ANIMATION, FILTER, SORT, STORAGE_KEYS } from '../config';
 
 /**
  * Single hook owning the shopping list's business state and lifecycle:
@@ -66,11 +66,11 @@ export function useShoppingItems() {
   const filteredItems = useMemo(() => {
     let result = [...items];
 
-    if (filter === 'completed') {
+    if (filter === FILTER.COMPLETED) {
       result = result.filter((item) => item.completed);
-    } else if (filter === 'pending') {
+    } else if (filter === FILTER.PENDING) {
       result = result.filter((item) => !item.completed);
-    } else if (filter !== 'all') {
+    } else if (filter !== FILTER.ALL) {
       result = result.filter((item) => item.category === filter);
     }
 
@@ -82,11 +82,11 @@ export function useShoppingItems() {
       );
     }
 
-    if (sortBy === 'name') {
+    if (sortBy === SORT.NAME) {
       result.sort((a, b) => a.name.localeCompare(b.name));
-    } else if (sortBy === 'category') {
+    } else if (sortBy === SORT.CATEGORY) {
       result.sort((a, b) => a.category.localeCompare(b.category));
-    } else if (sortBy === 'created') {
+    } else if (sortBy === SORT.CREATED) {
       result.sort(
         (a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime(),
       );

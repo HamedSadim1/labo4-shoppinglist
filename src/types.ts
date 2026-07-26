@@ -88,6 +88,8 @@ const categoryMap = Object.fromEntries(categories.map((c) => [c.id, c])) as Reco
  * Returned by `getCategoryInfo` so consumer call sites can treat the result
  * as a fully-populated `CategoryInfo` without inline `??` chains.
  */
+import { FILTER, SORT } from './config';
+
 export const FALLBACK_CATEGORY: CategoryInfo = {
   id: 'Other',
   label: 'Other',
@@ -101,6 +103,8 @@ export function getCategoryInfo(categoryId: string): CategoryInfo {
   return categoryMap[categoryId] ?? FALLBACK_CATEGORY;
 }
 
-export type ShoppingListFilter = 'all' | 'pending' | 'completed';
+/** Single source of truth for built-in status filters — derived from config. */
+export type ShoppingListFilter = (typeof FILTER)[keyof typeof FILTER];
 
-export type SortOption = 'default' | 'name' | 'category' | 'created';
+/** Single source of truth for sort options — derived from config. */
+export type SortOption = (typeof SORT)[keyof typeof SORT];

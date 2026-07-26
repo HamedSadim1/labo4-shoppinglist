@@ -2,10 +2,12 @@ import { Formik, Form, Field, useFormikContext, type FieldProps } from 'formik';
 import { useEffect, useRef, type RefObject } from 'react';
 import { ShoppingItem } from '../types';
 import AmountInput from './ui/AmountInput';
+import Button from './ui/Button';
+import Card from './ui/Card';
 import CategorySelect from './ui/CategorySelect';
+import FormTextInput from './ui/FormTextInput';
 import { CheckIcon, XIcon } from './ui/icons';
 import { useEnterSubmit } from '../hooks/useEnterSubmit';
-import { ITEM_NAME } from '../config';
 import { shoppingItemSchema, type ShoppingItemFormValues } from '../validation/schemas';
 
 interface EditItemProps {
@@ -29,36 +31,18 @@ function EditItemContents({
   inputRef: RefObject<HTMLInputElement | null>;
   onCancel: () => void;
 }) {
-  const { errors, touched, submitForm, submitCount } = useFormikContext<ShoppingItemFormValues>();
-  const showNameError = Boolean(errors.name && (touched.name || submitCount > 0));
+  const { submitForm } = useFormikContext<ShoppingItemFormValues>();
   const submitOnEnter = useEnterSubmit(submitForm);
 
   return (
     <Form className="space-y-3" noValidate>
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
-        <div className="flex-1">
-          <Field name="name">
-            {({ field }: FieldProps<string, ShoppingItemFormValues>) => (
-              <input
-                {...field}
-                ref={inputRef}
-                type="text"
-                maxLength={ITEM_NAME.MAX_LENGTH}
-                placeholder="Item name"
-                onKeyDown={submitOnEnter}
-                aria-invalid={showNameError}
-                className={`w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-white/10 border rounded-xl text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-purple-400/15 transition-all duration-200 backdrop-blur-sm ${
-                  showNameError
-                    ? 'border-rose-400/50 ring-2 ring-rose-400/15'
-                    : 'border-white/20 focus:border-purple-400/50'
-                }`}
-              />
-            )}
-          </Field>
-          {showNameError && (
-            <p className="mt-1.5 text-xs text-rose-300/90 animate-fade-in">{errors.name}</p>
-          )}
-        </div>
+        <FormTextInput
+          inputRef={inputRef}
+          placeholder="Item name"
+          onKeyDown={submitOnEnter}
+          size="compact"
+        />
 
         <div className="flex gap-2">
           <Field name="amount">
@@ -83,22 +67,14 @@ function EditItemContents({
       </div>
 
       <div className="flex gap-2 justify-end">
-        <button
-          type="button"
-          onClick={() => submitForm()}
-          className="flex items-center gap-1.5 bg-gradient-to-r from-purple-500/30 to-pink-500/30 hover:from-purple-500/40 hover:to-pink-500/40 border border-purple-400/30 text-purple-100 font-semibold px-4 sm:px-5 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm hover:shadow-lg hover:shadow-purple-500/20 active:scale-[0.97] text-sm"
-        >
+        <Button onClick={() => submitForm()} size="sm">
           <CheckIcon className="w-4 h-4" />
           Save
-        </button>
-        <button
-          type="button"
-          onClick={onCancel}
-          className="flex items-center gap-1.5 bg-white/5 hover:bg-white/15 border border-white/15 text-white/60 hover:text-white font-semibold px-4 sm:px-5 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm hover:shadow-lg active:scale-[0.97] text-sm"
-        >
+        </Button>
+        <Button onClick={onCancel} variant="secondary" size="sm">
           <XIcon className="w-4 h-4" />
           Cancel
-        </button>
+        </Button>
       </div>
     </Form>
   );
@@ -113,7 +89,14 @@ export default function EditItem({ item, onSave, onCancel }: EditItemProps) {
   }, []);
 
   return (
-    <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-4 space-y-3 shadow-xl border border-purple-400/20 animate-scale-in">
+    <Card
+      variant="soft"
+      padding="p-3 sm:p-4"
+      rounding="rounded-xl sm:rounded-2xl"
+      animation="scale-in"
+      shadow={false}
+      className="space-y-3 shadow-xl border-purple-400/20"
+    >
       <Formik<ShoppingItemFormValues>
         initialValues={{
           name: item.name,
@@ -127,6 +110,6 @@ export default function EditItem({ item, onSave, onCancel }: EditItemProps) {
       >
         <EditItemContents inputRef={inputRef} onCancel={onCancel} />
       </Formik>
-    </div>
+    </Card>
   );
 }

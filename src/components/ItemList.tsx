@@ -3,7 +3,7 @@ import { ShoppingItem } from '../types';
 import Card from './ui/Card';
 import Item from './Item';
 import EditItem from './EditItem';
-import { ANIMATION } from '../config';
+import { ANIMATION, FILTER } from '../config';
 
 interface ItemListProps {
   items: ShoppingItem[];
@@ -27,11 +27,11 @@ function EmptyState({ filter, searchQuery }: { filter: string; searchQuery: stri
     emoji = '🔍';
     title = 'No results found';
     description = `No items match "${searchQuery}". Try a different search term.`;
-  } else if (filter === 'completed') {
+  } else if (filter === FILTER.COMPLETED) {
     emoji = '✅';
     title = 'No completed items';
     description = 'Items you mark as complete will appear here.';
-  } else if (filter === 'pending') {
+  } else if (filter === FILTER.PENDING) {
     emoji = '📝';
     title = 'Nothing pending!';
     description = 'All items are completed. Great job!';
