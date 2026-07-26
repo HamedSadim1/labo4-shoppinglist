@@ -1,5 +1,6 @@
 import type { ReactNode, RefObject } from 'react';
 import { useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { XIcon } from './icons';
 import Card from './Card';
 
@@ -100,7 +101,7 @@ export default function Dialog({
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in"
       role="dialog"
@@ -134,6 +135,7 @@ export default function Dialog({
           {children}
         </Card>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
