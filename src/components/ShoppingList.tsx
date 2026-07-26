@@ -1,79 +1,100 @@
-import { useState } from 'react';
-import { ShoppingItem } from '../types';
-import { useLocalStorage } from '../hooks';
+import { useRef } from 'react';
+import { useClearFlow } from '../hooks/useClearFlow';
+import { useKeyboardShortcuts } from '../hooks/useKeyboardShortcuts';
+import { useShoppingItems } from '../hooks/useShoppingItems';
+import { useToast } from '../hooks/useToast';
 import AddItemForm from './AddItemForm';
-import ItemFilters from './ItemFilters';
-import ItemStats from './ItemStats';
+import ClearCompletedDialog from './ClearCompletedDialog';
 import ItemList from './ItemList';
+import ItemsToolbar from './ItemsToolbar';
 
+/**
+ * Composition shell. Domain state lives in `useShoppingItems`; the
+ * clear-confirm workflow (state + handlers + toast) is owned by
+ * `useClearFlow`; keyboard handlers live in the global
+ * `useKeyboardShortcuts` hook. Each subcomponent receives only the
+ * props it needs.
+ */
 export default function ShoppingList() {
-  const [items, setItems] = useLocalStorage<ShoppingItem[]>('shoppingList', []);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [filter, setFilter] = useState('all');
+  const searchRef = useRef<HTMLInputElement>(null);
+  const { push } = useToast();
 
-  const addItem = (item: ShoppingItem) => {
-    setItems([...items, item]);
-  };
+  const {
+    items,
+    totalItems,
+    completedItems,
+    editingId,
+    filter,
+    sortBy,
+    searchQuery,
+    lastAddedId,
+    addItem,
+    toggleComplete,
+    removeItem,
+    startEdit,
+    saveEdit,
+    cancelEdit,
+    clearCompleted,
+    setFilter,
+    setSortBy,
+    setSearchQuery,
+  } = useShoppingItems();
 
-  const toggleComplete = (id: string) => {
-    setItems(
-      items.map((item) => (item.id === id ? { ...item, completed: !item.completed } : item)),
-    );
-  };
+  const { showClearConfirm, requestClear, cancelClear, confirmClear } = useClearFlow(
+    clearCompleted,
+    push,
+  );
 
-  const removeItem = (id: string) => {
-    setItems(items.filter((item) => item.id !== id));
-  };
-
-  const startEdit = (id: string) => {
-    setEditingId(id);
-  };
-
-  const saveEdit = (id: string, name: string, amount: number, category: string) => {
-    setItems(items.map((item) => (item.id === id ? { ...item, name, amount, category } : item)));
-    setEditingId(null);
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-  };
-
-  const clearCompleted = () => {
-    setItems(items.filter((item) => !item.completed));
-  };
-
-  const filteredItems = items.filter((item) => {
-    if (filter === 'all') return true;
-    if (filter === 'completed') return item.completed;
-    if (filter === 'pending') return !item.completed;
-    return item.category === filter;
+  useKeyboardShortcuts({
+    searchRef,
+    searchQuery,
+    setSearchQuery,
+    escapes: [
+      () => {
+        if (editingId) {
+          cancelEdit();
+          return true;
+        }
+        return false;
+      },
+    ],
   });
 
-  const totalItems = items.length;
-  const completedItems = items.filter((item) => item.completed).length;
-
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto space-y-4 sm:space-y-6 animate-fade-in-up">
       <AddItemForm onAddItem={addItem} />
 
-      <div className="backdrop-blur-md bg-white/20 border border-white/30 rounded-2xl p-6 mb-6 shadow-2xl">
-        <ItemStats
-          totalItems={totalItems}
-          completedItems={completedItems}
-          onClearCompleted={clearCompleted}
-        />
-        <ItemFilters filter={filter} onFilterChange={setFilter} />
-      </div>
+      <ItemsToolbar
+        totalItems={totalItems}
+        completedItems={completedItems}
+        onClearCompleted={requestClear}
+        searchRef={searchRef}
+        searchQuery={searchQuery}
+        onSearchChange={setSearchQuery}
+        sortBy={sortBy}
+        onSortChange={setSortBy}
+        filter={filter}
+        onFilterChange={setFilter}
+      />
 
       <ItemList
-        items={filteredItems}
+        items={items}
         editingId={editingId}
         filter={filter}
+        searchQuery={searchQuery}
+        highlightedId={lastAddedId}
         onToggleComplete={toggleComplete}
         onEdit={startEdit}
         onSaveEdit={saveEdit}
         onCancelEdit={cancelEdit}
         onRemove={removeItem}
+      />
+
+      <ClearCompletedDialog
+        open={showClearConfirm}
+        completedCount={completedItems}
+        onConfirm={confirmClear}
+        onCancel={cancelClear}
       />
     </div>
   );

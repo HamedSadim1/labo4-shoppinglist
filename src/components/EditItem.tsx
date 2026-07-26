@@ -1,5 +1,14 @@
-import { useState } from 'react';
-import { ShoppingItem, categories } from '../types';
+import { Formik, Form, Field, useFormikContext, type FieldProps } from 'formik';
+import { useEffect, useRef, type RefObject } from 'react';
+import { ShoppingItem } from '../types';
+import AmountInput from './ui/AmountInput';
+import Button from './ui/Button';
+import Card from './ui/Card';
+import CategorySelect from './ui/CategorySelect';
+import FormTextInput from './ui/FormTextInput';
+import { CheckIcon, XIcon } from './ui/icons';
+import { useEnterSubmit } from '../hooks/useEnterSubmit';
+import { shoppingItemSchema, type ShoppingItemFormValues } from '../validation/schemas';
 
 interface EditItemProps {
   item: ShoppingItem;
@@ -7,70 +16,100 @@ interface EditItemProps {
   onCancel: () => void;
 }
 
-export default function EditItem({ item, onSave, onCancel }: EditItemProps) {
-  const [name, setName] = useState(item.name);
-  const [amount, setAmount] = useState(item.amount);
-  const [category, setCategory] = useState(item.category);
-
-  const handleSave = () => {
-    if (name.trim()) {
-      onSave(item.id, name.trim(), amount, category);
-    }
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
-      handleSave();
-    } else if (e.key === 'Escape') {
-      onCancel();
-    }
-  };
+/**
+ * Inner edit body. Lives inside <Formik> so it can read form state via
+ * `useFormikContext` instead of the render-prop callback, giving us a real
+ * React function-component context to call `useEnterSubmit` from.
+ *
+ * Escape is handled by the global `useKeyboardShortcuts` hook
+ * (priority chain → cancelEdit); only Enter is wired here.
+ */
+function EditItemContents({
+  inputRef,
+  onCancel,
+}: {
+  inputRef: RefObject<HTMLInputElement | null>;
+  onCancel: () => void;
+}) {
+  const { submitForm } = useFormikContext<ShoppingItemFormValues>();
+  const submitOnEnter = useEnterSubmit(submitForm);
 
   return (
-    <div className="backdrop-blur-md bg-white/10 border border-white/20 rounded-2xl p-4 space-y-3 shadow-xl">
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        onKeyDown={handleKeyPress}
-        className="w-full px-3 py-3 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-white/50 focus:border-white/50 focus:outline-none backdrop-blur-sm"
-        autoFocus
-      />
-      <div className="flex space-x-2">
-        <input
-          type="number"
-          min="1"
-          value={amount}
-          onChange={(e) => setAmount(parseInt(e.target.value) || 1)}
-          onKeyDown={handleKeyPress}
-          className="flex-1 px-3 py-3 bg-white/10 border border-white/30 rounded-xl text-white placeholder-white/60 focus:ring-2 focus:ring-white/50 focus:border-white/50 focus:outline-none backdrop-blur-sm"
+    <Form className="space-y-3" noValidate>
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+        <FormTextInput
+          inputRef={inputRef}
+          placeholder="Item name"
+          onKeyDown={submitOnEnter}
+          size="compact"
         />
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          className="flex-1 px-3 py-3 bg-white/10 border border-white/30 rounded-xl text-white focus:ring-2 focus:ring-white/50 focus:border-white/50 focus:outline-none backdrop-blur-sm"
-        >
-          {categories.map((cat) => (
-            <option key={cat} value={cat} className="bg-gray-800 text-white">
-              {cat}
-            </option>
-          ))}
-        </select>
+
+        <div className="flex gap-2">
+          <Field name="amount">
+            {({ field, form }: FieldProps<number, ShoppingItemFormValues>) => (
+              <AmountInput
+                value={field.value}
+                onChange={(value) => form.setFieldValue('amount', value)}
+                onKeyDown={submitOnEnter}
+              />
+            )}
+          </Field>
+          <Field name="category">
+            {({ field, form }: FieldProps<string, ShoppingItemFormValues>) => (
+              <CategorySelect
+                value={field.value}
+                onChange={(value) => form.setFieldValue('category', value)}
+                onKeyDown={submitOnEnter}
+              />
+            )}
+          </Field>
+        </div>
       </div>
-      <div className="flex space-x-2">
-        <button
-          onClick={handleSave}
-          className="bg-green-500/20 hover:bg-green-500/30 border border-green-400/40 text-white font-semibold px-4 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm hover:shadow-lg"
-        >
+
+      <div className="flex gap-2 justify-end">
+        <Button onClick={() => submitForm()} size="sm">
+          <CheckIcon className="w-4 h-4" />
           Save
-        </button>
-        <button
-          onClick={onCancel}
-          className="bg-gray-500/20 hover:bg-gray-500/30 border border-gray-400/40 text-white font-semibold px-4 py-2 rounded-xl transition-all duration-200 backdrop-blur-sm hover:shadow-lg"
-        >
+        </Button>
+        <Button onClick={onCancel} variant="secondary" size="sm">
+          <XIcon className="w-4 h-4" />
           Cancel
-        </button>
+        </Button>
       </div>
-    </div>
+    </Form>
+  );
+}
+
+export default function EditItem({ item, onSave, onCancel }: EditItemProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    inputRef.current?.focus();
+    inputRef.current?.select();
+  }, []);
+
+  return (
+    <Card
+      variant="soft"
+      padding="p-3 sm:p-4"
+      rounding="rounded-xl sm:rounded-2xl"
+      animation="scale-in"
+      shadow={false}
+      className="space-y-3 shadow-xl border-purple-400/20"
+    >
+      <Formik<ShoppingItemFormValues>
+        initialValues={{
+          name: item.name,
+          amount: item.amount,
+          category: item.category,
+        }}
+        validationSchema={shoppingItemSchema}
+        onSubmit={(values) => {
+          onSave(item.id, values.name.trim(), values.amount, values.category);
+        }}
+      >
+        <EditItemContents inputRef={inputRef} onCancel={onCancel} />
+      </Formik>
+    </Card>
   );
 }
