@@ -1,5 +1,5 @@
 import type { ReactNode, RefObject } from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useLayoutEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { XIcon } from './icons';
 import Card from './Card';
@@ -82,11 +82,17 @@ export default function Dialog({
 }: DialogProps) {
   const contentRef = useFocusTrap<HTMLDivElement>(open);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!open) return;
 
-    const originalStyle = document.body.style.overflow;
+    const originalOverflow = document.body.style.overflow;
+    const originalPaddingRight = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+
     document.body.style.overflow = 'hidden';
+    if (scrollbarWidth > 0) {
+      document.body.style.paddingRight = `${scrollbarWidth}px`;
+    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -94,7 +100,8 @@ export default function Dialog({
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
-      document.body.style.overflow = originalStyle;
+      document.body.style.overflow = originalOverflow;
+      document.body.style.paddingRight = originalPaddingRight;
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [open, onClose]);

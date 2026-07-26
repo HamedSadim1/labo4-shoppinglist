@@ -104,23 +104,15 @@ export function useShoppingItems() {
    * Removes all completed items. Returns the number that were removed so the
    * consumer can drive UI side-effects (toasts) without re-deriving it.
    */
-  /* eslint-disable react-hooks/exhaustive-deps -- count derived inside the updater so deps can stay empty; setters are React-stable */
   const clearCompleted = useCallback(() => {
-    // The closure used to read `items` for the count, which forced
-    // `[items]` deps and rebuilt the ref on every CRUD mutation.
-    // Deriving the count *inside* the functional updater lets us drop the
-    // items dep entirely — the outer `count` settles to the value
-    // corresponding to whatever state React actually commits (StrictMode
-    // runs the updater twice in dev with the same answer; concurrent
-    // rendering uses the latest prev). Returns the count of items cleared.
-    let count = 0;
+    const countRef = { current: 0 };
     setItems((prev) => {
-      count = prev.filter((item) => item.completed).length;
-      return count > 0 ? prev.filter((item) => !item.completed) : prev;
+      const completed = prev.filter((item) => item.completed);
+      countRef.current = completed.length;
+      return completed.length > 0 ? prev.filter((item) => !item.completed) : prev;
     });
-    return count;
-  }, []);
-  /* eslint-enable react-hooks/exhaustive-deps */
+    return countRef.current;
+  }, [setItems]);
 
   return {
     items: filteredItems,

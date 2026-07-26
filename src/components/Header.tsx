@@ -18,7 +18,9 @@ export default function Header() {
         animation={false}
       >
         <div className="inline-flex items-center justify-center w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/10 border border-white/20 mb-4 sm:mb-5">
-          <span className="text-3xl sm:text-4xl">🛒</span>
+          <span className="text-3xl sm:text-4xl" aria-hidden="true">
+            🛒
+          </span>
         </div>
         <h1 className="text-3xl sm:text-5xl font-extrabold text-white mb-2 sm:mb-3 drop-shadow-lg tracking-tight">
           Shopping List

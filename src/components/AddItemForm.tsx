@@ -87,7 +87,9 @@ export default function AddItemForm({ onAddItem }: AddItemFormProps) {
   return (
     <Card variant="strong" padding="p-5 sm:p-6" className="mb-6">
       <h2 className="text-lg sm:text-xl font-bold text-white mb-4 flex items-center gap-2">
-        <span className="text-2xl">✨</span>
+        <span className="text-2xl" aria-hidden="true">
+          ✨
+        </span>
         <span>Add New Item</span>
       </h2>
       <Formik<ShoppingItemFormValues>

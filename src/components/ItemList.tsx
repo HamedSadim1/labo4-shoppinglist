@@ -50,7 +50,9 @@ function EmptyState({ filter, searchQuery }: { filter: string; searchQuery: stri
       className="text-center"
     >
       <div className="inline-flex items-center justify-center w-20 h-20 sm:w-24 sm:h-24 rounded-full bg-white/5 border border-white/10 mb-5">
-        <span className="text-4xl sm:text-5xl">{emoji}</span>
+        <span className="text-4xl sm:text-5xl" aria-hidden="true">
+          {emoji}
+        </span>
       </div>
       <h3 className="text-xl sm:text-2xl font-bold text-white/80 mb-2">{title}</h3>
       <p className="text-white/50 max-w-xs mx-auto">{description}</p>
@@ -99,8 +101,8 @@ export default function ItemList({
         return (
           <div
             key={item.id}
-            className="animate-fade-in-up"
-            style={{ animationFillMode: 'both', ...staggerStyle }}
+            className="animate-fade-in-up [animation-fill-mode:both]"
+            style={staggerStyle}
           >
             {isHighlighted ? <div className="animate-highlight-pulse">{body}</div> : body}
           </div>

@@ -1,5 +1,41 @@
 @import 'tailwindcss';
 
+/* ---------------------------------------------------------------------------
+ * Design tokens — single source of truth for colors, timing, and effects.
+ * ---------------------------------------------------------------------------
+ */
+:root {
+  /* Glass effect (shared background / blur / border) */
+  --glass-bg-soft: rgba(255, 255, 255, 0.08);
+  --glass-bg-strong: rgba(255, 255, 255, 0.12);
+  --glass-blur-soft: 12px;
+  --glass-blur-strong: 16px;
+  --glass-border-soft: rgba(255, 255, 255, 0.15);
+  --glass-border-strong: rgba(255, 255, 255, 0.2);
+
+  /* Accent colors */
+  --color-primary: rgb(168, 85, 247);
+  --color-secondary: rgb(236, 72, 153);
+  --color-white: rgb(255, 255, 255);
+
+  /* Timing */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-elastic: cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Focus ring */
+  --focus-ring-width: 2px;
+  --focus-ring-color: rgba(255, 255, 255, 0.5);
+
+  /* Scrollbar */
+  --scrollbar-width: 6px;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.2);
+  --scrollbar-thumb-hover: rgba(255, 255, 255, 0.3);
+}
+
+/* ---------------------------------------------------------------------------
+ * Keyframes
+ * ---------------------------------------------------------------------------
+ */
 @keyframes blob {
   0%,
   100% {
@@ -121,20 +157,20 @@
 .animate-checkmark-draw {
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  animation: checkmark-draw 0.32s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  animation: checkmark-draw 0.32s var(--ease-out-expo) forwards;
 }
 
 @keyframes highlight-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.55);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-primary) 55%, transparent);
     transform: scale(1);
   }
   50% {
-    box-shadow: 0 0 0 10px rgba(168, 85, 247, 0);
+    box-shadow: 0 0 0 10px transparent;
     transform: scale(1.015);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(168, 85, 247, 0);
+    box-shadow: 0 0 0 0 transparent;
     transform: scale(1);
   }
 }
@@ -159,16 +195,16 @@
 }
 
 .animate-celebrate-pop {
-  animation: celebrate-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+  animation: celebrate-pop 0.55s var(--ease-elastic) forwards;
 }
 
 @keyframes celebrate-progress {
   0%,
   100% {
-    box-shadow: 0 0 12px rgba(168, 85, 247, 0.35);
+    box-shadow: 0 0 12px color-mix(in srgb, var(--color-primary) 35%, transparent);
   }
   50% {
-    box-shadow: 0 0 24px rgba(236, 72, 153, 0.55);
+    box-shadow: 0 0 24px color-mix(in srgb, var(--color-secondary) 55%, transparent);
   }
 }
 
@@ -178,14 +214,6 @@
 
 .animate-blob {
   animation: blob 10s infinite;
-}
-
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
 }
 
 .animate-fade-in-up {
@@ -220,9 +248,21 @@
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
-/* Custom scrollbar */
+/* Toast animation classes */
+.toast-enter {
+  animation: toastIn 0.35s var(--ease-out-expo) forwards;
+}
+
+.toast-exit {
+  animation: toastOut 0.25s ease-in forwards;
+}
+
+/* ---------------------------------------------------------------------------
+ * Scrollbar — using design tokens.
+ * ---------------------------------------------------------------------------
+ */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: var(--scrollbar-width);
 }
 
 ::-webkit-scrollbar-track {
@@ -230,39 +270,36 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--scrollbar-thumb);
   border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: var(--scrollbar-thumb-hover);
 }
 
-/* Smooth focus ring */
+/* ---------------------------------------------------------------------------
+ * Focus ring — using design tokens.
+ * ---------------------------------------------------------------------------
+ */
 *:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.5);
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
   outline-offset: 2px;
   border-radius: 8px;
 }
 
-/* Glass effect base */
+/* ---------------------------------------------------------------------------
+ * Glass effect — using design tokens.
+ * ---------------------------------------------------------------------------
+ */
 .glass {
-  background: rgba(255, 255, 255, 0.08);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: var(--glass-bg-soft);
+  backdrop-filter: blur(var(--glass-blur-soft));
+  border: 1px solid var(--glass-border-soft);
 }
 
 .glass-strong {
-  background: rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-/* Toast animation classes */
-.toast-enter {
-  animation: toastIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.toast-exit {
-  animation: toastOut 0.25s ease-in forwards;
+  background: var(--glass-bg-strong);
+  backdrop-filter: blur(var(--glass-blur-strong));
+  border: 1px solid var(--glass-border-strong);
 }
