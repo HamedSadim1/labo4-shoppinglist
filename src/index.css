@@ -259,8 +259,16 @@
 
 /* ---------------------------------------------------------------------------
  * Scrollbar — using design tokens.
+ *
+ * `scrollbar-gutter: stable` reserves the scrollbar gutter even when the
+ * scrollbar is hidden, preventing the page content from jumping when a modal
+ * locks the body scroll.
  * ---------------------------------------------------------------------------
  */
+html {
+  scrollbar-gutter: stable;
+}
+
 ::-webkit-scrollbar {
   width: var(--scrollbar-width);
 }

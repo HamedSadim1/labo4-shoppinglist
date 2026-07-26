@@ -86,13 +86,7 @@ export default function Dialog({
     if (!open) return;
 
     const originalOverflow = document.body.style.overflow;
-    const originalPaddingRight = document.body.style.paddingRight;
-    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-
     document.body.style.overflow = 'hidden';
-    if (scrollbarWidth > 0) {
-      document.body.style.paddingRight = `${scrollbarWidth}px`;
-    }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -101,7 +95,6 @@ export default function Dialog({
 
     return () => {
       document.body.style.overflow = originalOverflow;
-      document.body.style.paddingRight = originalPaddingRight;
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [open, onClose]);
